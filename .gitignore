@@ -1,0 +1,22 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database files
+database/*.db
+database/*.db-journal
+
+# Uploaded files
+backend/private-uploads/*
+!backend/private-uploads/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db

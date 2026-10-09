@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Document Viewer | F-TECH-Student-Hub</title>
+  <meta name="description" content="Read, study, and analyze AKTU papers and handwritten notes online with F-TECH interactive document reader. Founded by Aditya Kumar Sharma.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/viewer.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="brand-link">
+          <div class="brand-logo-glow">FT</div>
+          <div class="brand-info">
+            <span class="brand-title">F-TECH</span>
+            <span class="brand-subtitle">Student-Hub</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Academic Portal</div>
+        <nav class="sidebar-nav">
+          <a href="../index.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Overview</span>
+          </a>
+          <a href="aktu-papers.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>AKTU Papers</span>
+          </a>
+          <a href="notes.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Handwritten Notes</span>
+          </a>
+          <a href="lab.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <span>Lab Experiments</span>
+          </a>
+          <a href="tutorial.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Tutorials</span>
+          </a>
+          <a href="subject.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Syllabus & Subjects</span>
+          </a>
+          <a href="community.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span>Community Forum</span>
+          </a>
+          <a href="donate.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span>Support & Donate</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-founder-card">
+        <div class="founder-header">
+          <div class="founder-avatar">AS</div>
+          <div class="founder-details">
+            <h6>Aditya Kumar Sharma</h6>
+            <p>Founder & Owner</p>
+          </div>
+        </div>
+        <div class="company-tag">
+          <span>Company: <strong>F-TECH</strong></span>
+          <span class="status-online"><span class="status-dot"></span> Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <main class="content-area" style="padding-top: 1.5rem;">
+        <div class="viewer-container">
+          <!-- Toolbar -->
+          <div class="viewer-toolbar">
+            <div class="viewer-toolbar-group">
+              <button id="toggleDrawerBtn" class="icon-btn" title="Toggle Table of Contents" style="width:34px; height:34px;">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+              </button>
+              <div class="viewer-doc-title" id="docViewerTitle">
+                Loading academic document...
+              </div>
+            </div>
+
+            <div class="viewer-toolbar-group">
+              <button onclick="changePage(-1)" class="icon-btn" style="width:34px; height:34px;" title="Previous Page">‹</button>
+              <div class="page-indicator">
+                <span>Page</span>
+                <input type="text" id="currentPageInput" value="1" class="page-input" readonly>
+                <span>of <span id="totalPagesText">4</span></span>
+              </div>
+              <button onclick="changePage(1)" class="icon-btn" style="width:34px; height:34px;" title="Next Page">›</button>
+            </div>
+
+            <div class="viewer-toolbar-group">
+              <button onclick="zoomDoc(-0.1)" class="icon-btn" style="width:34px; height:34px;" title="Zoom Out">−</button>
+              <span id="zoomLevelText" style="font-size:0.8rem; font-weight:700; width:45px; text-align:center;">100%</span>
+              <button onclick="zoomDoc(0.1)" class="icon-btn" style="width:34px; height:34px;" title="Zoom In">+</button>
+
+              <button id="togglePaperTheme" class="icon-btn" style="width:34px; height:34px;" title="Invert Reader Theme">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              </button>
+
+              <button onclick="downloadCurrentDoc()" class="btn btn-primary btn-sm" style="padding:0.35rem 0.85rem;">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Viewer Workspace -->
+          <div class="viewer-workspace">
+            <!-- Table of Contents Drawer -->
+            <div class="viewer-drawer" id="viewerDrawer">
+              <div class="drawer-header">Document Navigation</div>
+              <div class="toc-item active" onclick="gotoSection('secA')">
+                <span>Section A (2-Mark Qs)</span>
+                <small>Pg 1</small>
+              </div>
+              <div class="toc-item" onclick="gotoSection('secB')">
+                <span>Section B (10-Mark Qs)</span>
+                <small>Pg 2</small>
+              </div>
+              <div class="toc-item" onclick="gotoSection('secC')">
+                <span>Section C (Numericals)</span>
+                <small>Pg 3</small>
+              </div>
+              <div class="toc-item" onclick="gotoSection('ftechNotes')">
+                <span>F-TECH Solution Key</span>
+                <small>Pg 4</small>
+              </div>
+            </div>
+
+            <!-- Document Stage with Realistic Paper -->
+            <div class="document-stage" id="documentStage">
+              <div class="document-sheet" id="documentSheet" data-theme="light">
+                <div class="sheet-header">
+                  <div class="aktu-watermark">DR. A.P.J. ABDUL KALAM TECHNICAL UNIVERSITY, UTTAR PRADESH • VERIFIED BY F-TECH</div>
+                  <h1 id="paperSheetTitle">B.TECH. (SEM III) THEORY EXAMINATION 2023-24</h1>
+                  <div class="sheet-meta-bar">
+                    <span id="paperSheetCode">Subject: DATA STRUCTURES (KCS-301)</span>
+                    <span>Max Marks: 100 • Time: 3 Hours</span>
+                  </div>
+                </div>
+
+                <div class="sheet-content">
+                  <div id="secA">
+                    <h2>SECTION A (Attempt All Questions — 10 x 2 = 20 Marks)</h2>
+                    <div class="exam-question-box">
+                      <p><strong>Q1. (a)</strong> Define asymptotic notations Big-Oh (O), Omega (Ω) and Theta (Θ). State their formal definitions.</p>
+                      <p><strong>Q1. (b)</strong> Why is a circular queue preferred over a linear queue? Write the formula for full queue condition.</p>
+                      <p><strong>Q1. (c)</strong> Differentiate between Array and Singly Linked List with respect to random access and cache locality.</p>
+                      <p><strong>Q1. (d)</strong> Convert the following infix expression into postfix using Stack: <code>(A + B) * (C - D) / E</code>.</p>
+                      <p><strong>Q1. (e)</strong> What is a full binary tree vs complete binary tree? State the maximum nodes at height <em>h</em>.</p>
+                    </div>
+                  </div>
+
+                  <div id="secB" style="margin-top:2.5rem;">
+                    <h2>SECTION B (Attempt Any Three Questions — 3 x 10 = 30 Marks)</h2>
+                    <div class="exam-question-box">
+                      <p><strong>Q2. (a)</strong> Write a detailed C++ algorithm to insert and delete an element from a Doubly Linked List. Trace with an example of 5 nodes.</p>
+                      <p><strong>Q2. (b)</strong> Explain the Tower of Hanoi problem with 3 disks. Write recursive pseudocode and solve its recurrence relation: <code>T(n) = 2T(n-1) + 1</code>.</p>
+                      <p><strong>Q2. (c)</strong> Construct an AVL tree by inserting the following sequence: <code>50, 20, 60, 10, 8, 15, 32, 46, 11, 48</code>. Clearly specify LL, RR, LR, and RL rotations.</p>
+                    </div>
+                  </div>
+
+                  <div id="secC" style="margin-top:2.5rem;">
+                    <h2>SECTION C (Long Answer / Numerical Section — 5 x 10 = 50 Marks)</h2>
+                    <div class="exam-question-box">
+                      <p><strong>Q3.</strong> Apply Dijkstra's Single Source Shortest Path Algorithm on a directed graph with 6 vertices. Show step-by-step distance table updates.</p>
+                      <p><strong>Q4.</strong> Explain B-Tree of order <em>m</em>. Show step-by-step creation of a B-Tree of order 5 with keys: <code>1, 12, 8, 2, 25, 6, 14, 28, 17, 7, 52, 16, 48</code>.</p>
+                    </div>
+                  </div>
+
+                  <div id="ftechNotes" style="margin-top:3rem; padding-top:1.5rem; border-top:1px dashed #6366f1;">
+                    <h2>F-TECH Solved Study Notes & Reference</h2>
+                    <p>
+                      <strong>Verified by:</strong> Aditya Kumar Sharma, Founder F-TECH.<br>
+                      <em>Key Advice:</em> In Section A, always provide formal diagrams for Big-Oh notations and 1-line examples. In Section B AVL questions, draw intermediate trees after every unbalanced insertion to secure full 10 marks!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script>
+    let currentZoom = 1.0;
+    let currentDocId = 1;
+    let currentPage = 1;
+    const totalPages = 4;
+
+    function zoomDoc(delta) {
+      currentZoom = Math.min(Math.max(currentZoom + delta, 0.6), 1.6);
+      const sheet = document.getElementById('documentSheet');
+      sheet.style.transform = `scale(${currentZoom})`;
+      document.getElementById('zoomLevelText').textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function changePage(delta) {
+      currentPage = Math.min(Math.max(currentPage + delta, 1), totalPages);
+      document.getElementById('currentPageInput').value = currentPage;
+      const sections = ['secA', 'secB', 'secC', 'ftechNotes'];
+      gotoSection(sections[currentPage - 1]);
+    }
+
+    function gotoSection(secId) {
+      const el = document.getElementById(secId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function downloadCurrentDoc() {
+      FTechApp.showToast('Downloading document...', 'info');
+      window.location.href = `${FTechApp.API_BASE}/api/documents/${currentDocId}/download`;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      currentDocId = urlParams.get('id') || 1;
+
+      // Toggle drawer
+      const drawer = document.getElementById('viewerDrawer');
+      const toggleDrawerBtn = document.getElementById('toggleDrawerBtn');
+      toggleDrawerBtn.addEventListener('click', () => {
+        drawer.classList.toggle('collapsed');
+      });
+
+      // Toggle sheet dark/light theme
+      const sheet = document.getElementById('documentSheet');
+      const themeBtn = document.getElementById('togglePaperTheme');
+      themeBtn.addEventListener('click', () => {
+        const theme = sheet.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        sheet.setAttribute('data-theme', theme);
+        FTechApp.showToast(`Viewer theme: ${theme}`, 'info');
+      });
+
+      // Load document data from API
+      const res = await FTechApp.apiCall(`/api/documents/${currentDocId}`);
+      if (res.success && res.data) {
+        const doc = res.data;
+        document.title = `${doc.title} | F-TECH Interactive Viewer`;
+        document.getElementById('docViewerTitle').textContent = doc.title;
+        document.getElementById('paperSheetTitle').textContent = doc.title.toUpperCase();
+        document.getElementById('paperSheetCode').textContent = `Subject: ${doc.subject_code} (Semester ${doc.semester})`;
+      }
+    });
+  </script>
+</body>
+</html>

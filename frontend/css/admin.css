@@ -1,0 +1,246 @@
+/* ==========================================================================
+   F-TECH-Student-Hub Admin Stylesheet
+   Company: F-TECH
+   Founder & Owner: Aditya Kumar Sharma
+   ========================================================================== */
+
+/* Admin Login Layout */
+.admin-login-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.2) 0%, #0a0e17 70%);
+}
+
+[data-theme="light"].admin-login-body,
+[data-theme="light"] .admin-login-body {
+  background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.1) 0%, #f1f5f9 70%);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-highlight);
+  border-radius: var(--radius-lg);
+  padding: 2.75rem 2.25rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.15);
+  animation: fadeIn 0.4s ease;
+}
+
+[data-theme="light"] .admin-login-card {
+  background: #ffffff;
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12), 0 0 30px rgba(99, 102, 241, 0.08);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-brand .brand-logo-glow {
+  margin: 0 auto 1rem;
+  width: 56px;
+  height: 56px;
+  font-size: 1.6rem;
+}
+
+.login-brand h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="light"] .login-brand h2 {
+  color: #0f172a;
+}
+
+.login-brand p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+[data-theme="light"] .login-brand p {
+  color: #334155;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Admin Dashboard Specific */
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-topbar h1 {
+  color: var(--text-main);
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+[data-theme="light"] .admin-badge {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* Data Table */
+.data-table-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .data-table-container {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.table-header-bar {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+[data-theme="light"] .table-header-bar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.table-header-bar h3 {
+  color: var(--text-main);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-glass);
+  color: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="light"] .admin-table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.admin-table td {
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+[data-theme="light"] .admin-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.admin-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .admin-table tr:hover td {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.status-approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+[data-theme="light"] .status-approved {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+[data-theme="light"] .status-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon-danger {
+  color: var(--accent-rose);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-icon-danger:hover {
+  background: rgba(244, 63, 94, 0.15);
+}

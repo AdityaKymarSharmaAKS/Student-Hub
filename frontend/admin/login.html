@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal Sign-In | F-TECH-Student-Hub</title>
+  <meta name="description" content="Secure administrative gateway for F-TECH-Student-Hub. Founded by Aditya Kumar Sharma (F-TECH).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-login-body">
+  <div class="admin-login-card">
+    <div class="login-brand">
+      <div class="brand-logo-glow">FT</div>
+      <h2>F-TECH Governance Portal</h2>
+      <p>Secure Admin Access • <strong>Aditya Kumar Sharma</strong></p>
+    </div>
+
+    <form class="login-form" onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label for="adminUsername">Admin Username</label>
+        <input type="text" id="adminUsername" class="form-control" placeholder="Enter username (default: admin)" required>
+      </div>
+
+      <div class="form-group">
+        <label for="adminPassword">Security Passkey</label>
+        <input type="password" id="adminPassword" class="form-control" placeholder="••••••••••••" required>
+      </div>
+
+      <button type="submit" id="adminLoginBtn" class="btn btn-primary" style="margin-top:0.5rem; width:100%;">
+        Sign In to F-TECH Admin
+      </button>
+
+      <div style="text-align: center; font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">
+        Default Credentials: <code>admin</code> / <code>ftechadmin2026</code>
+      </div>
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="../index.html" style="font-size: 0.85rem; color: var(--secondary);">
+          &larr; Return to Student-Hub Portal
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Community & Discussion Board | F-TECH-Student-Hub</title>
+  <meta name="description" content="Collaborative engineering doubts, AKTU exam tips, and peer discussions. Founded by Aditya Kumar Sharma (F-TECH).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/cards.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="brand-link">
+          <div class="brand-logo-glow">FT</div>
+          <div class="brand-info">
+            <span class="brand-title">F-TECH</span>
+            <span class="brand-subtitle">Student-Hub</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Academic Portal</div>
+        <nav class="sidebar-nav">
+          <a href="../index.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Overview</span>
+          </a>
+          <a href="aktu-papers.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>AKTU Papers</span>
+          </a>
+          <a href="notes.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Handwritten Notes</span>
+          </a>
+          <a href="lab.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <span>Lab Experiments</span>
+          </a>
+          <a href="tutorial.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Tutorials</span>
+          </a>
+          <a href="subject.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Syllabus & Subjects</span>
+          </a>
+          <a href="community.html" class="nav-item active">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span>Community Forum</span>
+          </a>
+          <a href="donate.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span>Support & Donate</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-founder-card">
+        <div class="founder-header">
+          <div class="founder-avatar">AS</div>
+          <div class="founder-details">
+            <h6>Aditya Kumar Sharma</h6>
+            <p>Founder & Owner</p>
+          </div>
+        </div>
+        <div class="company-tag">
+          <span>Company: <strong>F-TECH</strong></span>
+          <span class="status-online"><span class="status-dot"></span> Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div class="nav-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <div class="search-box">
+            <span class="search-icon">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="text" id="communitySearch" placeholder="Search doubts, tips, or tags...">
+          </div>
+        </div>
+        <div class="nav-right">
+          <div class="founder-badge-pill">
+            <span>F-TECH</span> • Aditya Kumar Sharma
+          </div>
+          <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+          <button id="openAskModalBtn" class="btn btn-primary btn-sm">
+            Ask a Question
+          </button>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">
+              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--primary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+              Student Discussion Board & Doubt Solving
+            </h1>
+            <p class="section-subtitle">Interact with fellow engineering students across colleges and get solutions</p>
+          </div>
+        </div>
+
+        <!-- Posts List -->
+        <div id="postsList" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <!-- Loaded dynamically via js/community.js -->
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div class="footer-bottom">
+          <div class="founder-credit">
+            © 2026 <strong>F-TECH</strong> • Established by <strong>Aditya Kumar Sharma</strong>.
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Ask Question Modal -->
+  <div class="modal-overlay" id="askQuestionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Post a Doubt or Discussion</h3>
+        <span class="modal-close" id="closeAskModal">&times;</span>
+      </div>
+      <form id="askForm" class="modal-body">
+        <div class="form-group">
+          <label>Question Title *</label>
+          <input type="text" id="postTitle" class="form-control" placeholder="What is your doubt or question?" required>
+        </div>
+        <div class="form-group">
+          <label>Explanation / Details *</label>
+          <textarea id="postContent" class="form-control" rows="4" placeholder="Provide background or specific subject code..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input type="text" id="postTags" class="form-control" placeholder="e.g. aktu, dsa, kcs301, exam-tips">
+        </div>
+        <div class="form-group">
+          <label>Your Name & Branch</label>
+          <input type="text" id="postAuthor" class="form-control" placeholder="e.g. Priya Sharma (CSE)">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:0.5rem;">
+          Post to Discussion Board
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script>
+    async function loadCommunityPosts(search = '') {
+      const list = document.getElementById('postsList');
+      list.innerHTML = '<p style="text-align:center; padding:2rem;">Loading discussions...</p>';
+
+      const url = search ? `/api/community?search=${encodeURIComponent(search)}` : '/api/community';
+      const res = await FTechApp.apiCall(url);
+
+      if (res.success && res.data) {
+        if (res.data.length === 0) {
+          list.innerHTML = '<div style="text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg);"><p>No discussions found. Be the first to ask!</p></div>';
+          return;
+        }
+
+        list.innerHTML = res.data.map(p => {
+          const tags = p.tags ? p.tags.split(',') : ['aktu'];
+          return `
+            <div class="post-card">
+              <div class="post-votes">
+                <button onclick="upvotePost(${p.id}, this)" class="vote-btn" title="Upvote">
+                  ▲
+                </button>
+                <span class="vote-count" id="vote-${p.id}">${p.upvotes}</span>
+                <span style="font-size:0.7rem; color:var(--text-dim);">votes</span>
+              </div>
+              <div class="post-body">
+                <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.25rem;">
+                  Posted by <strong style="color:var(--text-main);">${p.author_name}</strong> 
+                  <span class="badge-tag badge-sem" style="padding:0.15rem 0.4rem; font-size:0.68rem; margin-left:0.4rem;">${p.author_badge || 'Student'}</span>
+                </div>
+                <h3 class="post-title">${p.title}</h3>
+                <p class="post-preview">${p.content}</p>
+                <div class="tag-list">
+                  ${tags.map(t => `<span class="tag-pill">#${t.trim()}</span>`).join('')}
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-dim); padding-top:0.5rem; border-top:1px solid var(--border-glass);">
+                  <span>${p.views} views • ${p.answers_count} replies</span>
+                  <button onclick="replyPrompt(${p.id})" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.65rem; font-size:0.75rem;">
+                    Answer Question
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    async function upvotePost(id, btn) {
+      const res = await FTechApp.apiCall(`/api/community/${id}/upvote`, { method: 'POST' });
+      if (res.success) {
+        document.getElementById(`vote-${id}`).textContent = res.upvotes;
+        btn.style.color = 'var(--primary)';
+        FTechApp.showToast('Upvoted!', 'success');
+      }
+    }
+
+    async function replyPrompt(id) {
+      const ans = prompt('Write your helpful answer to this question:');
+      if (ans && ans.trim()) {
+        const name = prompt('Your Name (optional):') || 'Fellow Student';
+        const res = await FTechApp.apiCall(`/api/community/${id}/answers`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: ans.trim(), author_name: name })
+        });
+        if (res.success) {
+          FTechApp.showToast('Your answer was posted!', 'success');
+          loadCommunityPosts();
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCommunityPosts();
+
+      const searchInput = document.getElementById('communitySearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          loadCommunityPosts(searchInput.value.trim());
+        });
+      }
+
+      // Ask Modal
+      const modal = document.getElementById('askQuestionModal');
+      const openBtn = document.getElementById('openAskModalBtn');
+      const closeBtn = document.getElementById('closeAskModal');
+      const form = document.getElementById('askForm');
+
+      openBtn.addEventListener('click', () => modal.classList.add('active'));
+      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('postTitle').value.trim();
+        const content = document.getElementById('postContent').value.trim();
+        const tags = document.getElementById('postTags').value.trim();
+        const author_name = document.getElementById('postAuthor').value.trim();
+
+        const res = await FTechApp.apiCall('/api/community', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content, tags, author_name })
+        });
+
+        if (res.success) {
+          FTechApp.showToast('Question posted successfully!', 'success');
+          form.reset();
+          modal.classList.remove('active');
+          loadCommunityPosts();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

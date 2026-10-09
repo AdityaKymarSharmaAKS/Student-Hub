@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F-TECH-Student-Hub | AKTU & Engineering Academic Portal</title>
+  <meta name="description" content="F-TECH-Student-Hub founded by Aditya Kumar Sharma (F-TECH). The ultimate academic repository for AKTU question papers, handwritten notes, lab codes, and engineering tutorials.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/cards.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <a href="index.html" class="brand-link">
+          <div class="brand-logo-glow">FT</div>
+          <div class="brand-info">
+            <span class="brand-title">F-TECH</span>
+            <span class="brand-subtitle">Student-Hub</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Academic Portal</div>
+        <nav class="sidebar-nav">
+          <a href="index.html" class="nav-item active">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Overview</span>
+          </a>
+          <a href="pages/aktu-papers.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>AKTU Papers</span>
+            <span class="nav-badge">PYQs</span>
+          </a>
+          <a href="pages/notes.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Handwritten Notes</span>
+          </a>
+          <a href="pages/lab.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <span>Lab Experiments</span>
+          </a>
+          <a href="pages/tutorial.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Tutorials</span>
+          </a>
+          <a href="pages/subject.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Syllabus & Subjects</span>
+          </a>
+          <a href="pages/community.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span>Community Forum</span>
+          </a>
+          <a href="pages/donate.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span>Support & Donate</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Quick Semesters</div>
+        <div class="sem-grid">
+          <button class="sem-btn" data-sem="1">Sem 1</button>
+          <button class="sem-btn" data-sem="2">Sem 2</button>
+          <button class="sem-btn" data-sem="3">Sem 3</button>
+          <button class="sem-btn" data-sem="4">Sem 4</button>
+          <button class="sem-btn" data-sem="5">Sem 5</button>
+          <button class="sem-btn" data-sem="6">Sem 6</button>
+          <button class="sem-btn" data-sem="7">Sem 7</button>
+          <button class="sem-btn" data-sem="8">Sem 8</button>
+        </div>
+      </div>
+
+      <!-- Founder Card -->
+      <div class="sidebar-founder-card">
+        <div class="founder-header">
+          <div class="founder-avatar">AS</div>
+          <div class="founder-details">
+            <h6>Aditya Kumar Sharma</h6>
+            <p>Founder & Owner</p>
+          </div>
+        </div>
+        <div class="company-tag">
+          <span>Company: <strong>F-TECH</strong></span>
+          <span class="status-online"><span class="status-dot"></span> Live</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation -->
+      <header class="top-nav">
+        <div class="nav-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div class="search-box">
+            <span class="search-icon">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input type="text" id="globalSearchInput" placeholder="Search subjects, codes, or PYQs... (Ctrl+K)">
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <div class="founder-badge-pill">
+            <span>F-TECH</span> • Founded by Aditya Kumar Sharma
+          </div>
+
+          <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme" aria-label="Toggle theme">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
+
+          <button class="btn btn-secondary btn-sm open-upload-modal">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Upload Material
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content-area">
+        <!-- Hero Section -->
+        <section class="hero-banner">
+          <div class="hero-tag">Empowering AKTU & Engineering Students</div>
+          <h1 class="hero-title">
+            Master Your Semester with <br>
+            <span class="gradient-text">F-TECH-Student-Hub</span>
+          </h1>
+          <p class="hero-description">
+            The premier academic portal built by <strong>Aditya Kumar Sharma (F-TECH)</strong>. 
+            Access high-scoring AKTU previous year question papers, verified handwritten topper notes, 
+            runnable lab codes with viva solutions, and interactive discussions.
+          </p>
+          <div class="hero-actions">
+            <a href="pages/aktu-papers.html" class="btn btn-primary">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Explore AKTU PYQs (2021-2024)
+            </a>
+            <a href="pages/notes.html" class="btn btn-secondary">
+              Browse Notes by Unit
+            </a>
+            <a href="pages/lab.html" class="btn btn-secondary">
+              Practical Lab Manuals
+            </a>
+          </div>
+        </section>
+
+        <!-- Stats Overview Widgets -->
+        <div class="stats-grid">
+          <div class="stat-widget">
+            <div class="stat-icon indigo">📚</div>
+            <div>
+              <div class="stat-number">10+</div>
+              <div class="stat-label">Core AKTU Subjects</div>
+            </div>
+          </div>
+          <div class="stat-widget">
+            <div class="stat-icon cyan">📑</div>
+            <div>
+              <div class="stat-number">100%</div>
+              <div class="stat-label">Verified PYQs & Notes</div>
+            </div>
+          </div>
+          <div class="stat-widget">
+            <div class="stat-icon emerald">⚡</div>
+            <div>
+              <div class="stat-number">25,000+</div>
+              <div class="stat-label">Student Downloads</div>
+            </div>
+          </div>
+          <div class="stat-widget">
+            <div class="stat-icon amber">👑</div>
+            <div>
+              <div class="stat-number">F-TECH</div>
+              <div class="stat-label">Aditya Kumar Sharma</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Subjects Section -->
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--primary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              Popular Semester Subjects
+            </h2>
+            <p class="section-subtitle">Curated curriculum with unit breakdown, syllabus and resources</p>
+          </div>
+          <a href="pages/subject.html" class="btn btn-secondary btn-sm">View All Subjects &rarr;</a>
+        </div>
+
+        <!-- Subject Cards Grid -->
+        <div id="subjectsGrid" class="cards-grid">
+          <!-- Populated dynamically via js/subjects.js -->
+        </div>
+
+        <!-- Trending Notes & AKTU PYQs Quick Section -->
+        <div style="margin-top: 3.5rem;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--secondary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Top Downloaded Exam Materials
+              </h2>
+              <p class="section-subtitle">Most downloaded handwritten notes & AKTU question papers this week</p>
+            </div>
+            <a href="pages/aktu-papers.html" class="btn btn-secondary btn-sm">All Question Papers &rarr;</a>
+          </div>
+
+          <div id="documentsGrid" class="cards-grid">
+            <!-- Populated dynamically via js/documents.js -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <h4>F-TECH-Student-Hub</h4>
+            <p>
+              The premier academic engineering ecosystem initiated and founded by <strong>Aditya Kumar Sharma</strong> under <strong>F-TECH</strong>. 
+              Designed to help students achieve top scores in AKTU end-semester exams and master technical skills.
+            </p>
+          </div>
+          <div class="footer-col">
+            <h5>Academics</h5>
+            <div class="footer-links">
+              <a href="pages/aktu-papers.html">AKTU Question Papers</a>
+              <a href="pages/notes.html">Handwritten Notes</a>
+              <a href="pages/lab.html">Practical Lab Codes</a>
+              <a href="pages/tutorial.html">Video Tutorials</a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h5>Community</h5>
+            <div class="footer-links">
+              <a href="pages/community.html">Student Discussion Board</a>
+              <a href="pages/donate.html">Support F-TECH Hub</a>
+              <a href="pages/document-viewer.html">Interactive Reader</a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h5>Leadership</h5>
+            <div class="footer-links">
+              <p><strong>Company:</strong> F-TECH</p>
+              <p><strong>Founder & Owner:</strong> Aditya Kumar Sharma</p>
+              <p><strong>Focus:</strong> AKTU & Engineering Excellence</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div class="founder-credit">
+            © 2026 <strong>F-TECH</strong> • All Rights Reserved. Conceptualized & Founded by <strong>Aditya Kumar Sharma</strong>.
+          </div>
+          <div>
+            Built with modern web standards & high performance.
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Upload Modal Dialog -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Contribute Material to F-TECH Hub</h3>
+        <span class="modal-close" id="closeUploadModal">&times;</span>
+      </div>
+      <form id="studentUploadForm" class="modal-body">
+        <div class="form-group">
+          <label>Document Title *</label>
+          <input type="text" id="uploadTitle" class="form-control" placeholder="e.g. Data Structures Unit 2 Trees Notes" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="uploadType" class="form-control" required>
+              <option value="notes">Handwritten Notes</option>
+              <option value="aktu-paper">AKTU Question Paper</option>
+              <option value="lab">Lab Manual</option>
+              <option value="tutorial">Tutorial Guide</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="uploadSubjectCode" class="form-control" placeholder="e.g. KCS-301" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Semester</label>
+            <select id="uploadSemester" class="form-control">
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3" selected>Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Branch</label>
+            <select id="uploadBranch" class="form-control">
+              <option value="CSE">CSE / IT</option>
+              <option value="ECE">ECE</option>
+              <option value="ME">Mechanical</option>
+              <option value="Civil">Civil</option>
+              <option value="Common">Common (1st Year)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Your Name / Contributor *</label>
+          <input type="text" id="uploadAuthor" class="form-control" placeholder="e.g. Alok Vishwakarma">
+        </div>
+        <div class="form-group">
+          <label>File Upload (PDF, DOCX, ZIP - Max 25MB)</label>
+          <div id="fileDropZone" style="border: 2px dashed var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; cursor: pointer;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Click or drag and drop your document here</p>
+            <input type="file" id="uploadFileInput" style="display:none;" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip">
+            <div id="selectedFileName" style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 600;"></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+          Upload to F-TECH Student-Hub
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/subjects.js"></script>
+  <script src="js/documents.js"></script>
+  <script src="js/uploads.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSubjects({ limit: 6 });
+      loadDocuments({ limit: 6 });
+    });
+  </script>
+</body>
+</html>

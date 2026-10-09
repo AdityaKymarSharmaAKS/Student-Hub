@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Lab Experiments & Code | F-TECH-Student-Hub</title>
+  <meta name="description" content="Verified AKTU practical lab experiments with C++, Java, and Python source code, outputs, and viva questions. Powered by F-TECH & Aditya Kumar Sharma.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/cards.css">
+  <style>
+    .lab-exp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .code-container {
+      background: #080c14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      margin: 1.25rem 0;
+      overflow: hidden;
+    }
+    .code-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.6rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .code-pre {
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+    .output-box {
+      background: rgba(16, 185, 129, 0.06);
+      border-left: 3px solid var(--accent-emerald);
+      padding: 1rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #a7f3d0;
+      white-space: pre-wrap;
+      margin-top: 1rem;
+    }
+    .viva-box {
+      background: rgba(99, 102, 241, 0.05);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+    }
+    .viva-q {
+      font-weight: 700;
+      color: #c7d2fe;
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+    .viva-a {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Light Mode Overrides for Lab */
+    [data-theme="light"] .lab-exp-card {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    [data-theme="light"] .output-box {
+      background: #ecfdf5;
+      border-left: 3px solid #059669;
+      color: #065f46;
+    }
+    [data-theme="light"] .viva-box {
+      background: #f8fafc;
+      border-color: rgba(99, 102, 241, 0.25);
+    }
+    [data-theme="light"] .viva-q {
+      color: #3730a3;
+    }
+    [data-theme="light"] .viva-a {
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="brand-link">
+          <div class="brand-logo-glow">FT</div>
+          <div class="brand-info">
+            <span class="brand-title">F-TECH</span>
+            <span class="brand-subtitle">Student-Hub</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Academic Portal</div>
+        <nav class="sidebar-nav">
+          <a href="../index.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Overview</span>
+          </a>
+          <a href="aktu-papers.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>AKTU Papers</span>
+          </a>
+          <a href="notes.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Handwritten Notes</span>
+          </a>
+          <a href="lab.html" class="nav-item active">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <span>Lab Experiments</span>
+          </a>
+          <a href="tutorial.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Tutorials</span>
+          </a>
+          <a href="subject.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Syllabus & Subjects</span>
+          </a>
+          <a href="community.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span>Community Forum</span>
+          </a>
+          <a href="donate.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span>Support & Donate</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-founder-card">
+        <div class="founder-header">
+          <div class="founder-avatar">AS</div>
+          <div class="founder-details">
+            <h6>Aditya Kumar Sharma</h6>
+            <p>Founder & Owner</p>
+          </div>
+        </div>
+        <div class="company-tag">
+          <span>Company: <strong>F-TECH</strong></span>
+          <span class="status-online"><span class="status-dot"></span> Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div class="nav-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <div class="search-box">
+            <span class="search-icon">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="text" id="labSearch" placeholder="Filter lab experiments or topics...">
+          </div>
+        </div>
+        <div class="nav-right">
+          <div class="founder-badge-pill">
+            <span>F-TECH</span> • Aditya Kumar Sharma
+          </div>
+          <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">
+              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--secondary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              Practical Lab Experiments & Viva Prep
+            </h1>
+            <p class="section-subtitle">Verified AKTU syllabus code implementations, dry run outputs, and examiner questions</p>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Lab Course:</div>
+          <select id="labSubjectSelect" class="filter-select">
+            <option value="">All Practical Courses</option>
+            <option value="KCS-301" selected>KCS-301: Data Structures Lab</option>
+            <option value="KCS-401">KCS-401: Operating Systems Lab</option>
+            <option value="KCS-503">KCS-503: Web Technology Lab</option>
+          </select>
+        </div>
+
+        <!-- Lab Experiments List Container -->
+        <div id="labsContainer">
+          <!-- Populated dynamically via script below -->
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div class="footer-bottom">
+          <div class="founder-credit">
+            © 2026 <strong>F-TECH</strong> • Developed by <strong>Aditya Kumar Sharma</strong>. Engineering Lab manuals for high practical viva marks.
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script>
+    async function loadLabExperiments(code = '') {
+      const container = document.getElementById('labsContainer');
+      container.innerHTML = '<p style="text-align:center; padding: 2rem;">Loading lab code...</p>';
+
+      const url = code ? `/api/subjects/${code}/labs` : '/api/subjects/labs/all';
+      const res = await FTechApp.apiCall(url);
+
+      if (res.success && res.data) {
+        if (res.data.length === 0) {
+          container.innerHTML = '<div style="text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg);"><p>No lab experiments found for this subject code.</p></div>';
+          return;
+        }
+
+        container.innerHTML = res.data.map(lab => {
+          let vivaHtml = '';
+          if (lab.viva_questions) {
+            try {
+              const vivaList = JSON.parse(lab.viva_questions);
+              vivaHtml = `
+                <div class="viva-box">
+                  <div style="font-size:0.85rem; font-weight:700; color:#818cf8; margin-bottom:0.75rem; text-transform:uppercase;">
+                    Frequently Asked Viva Voce Questions
+                  </div>
+                  ${vivaList.map(v => `
+                    <div class="viva-q">Q: ${v.q}</div>
+                    <div class="viva-a">Ans: ${v.a}</div>
+                  `).join('')}
+                </div>
+              `;
+            } catch(e) {}
+          }
+
+          return `
+            <div class="lab-exp-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+                <div>
+                  <span class="badge-tag badge-lab">Exp ${lab.exp_no} • ${lab.subject_code}</span>
+                  <h3 style="font-size:1.3rem; font-weight:800; margin-top:0.4rem;">${lab.title}</h3>
+                </div>
+                <span style="font-family:var(--font-mono); font-size:0.8rem; color:var(--secondary); background:rgba(6,182,212,0.1); padding:0.3rem 0.6rem; border-radius:var(--radius-sm);">
+                  ${lab.language || 'C++'}
+                </span>
+              </div>
+
+              <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:1rem;">
+                <strong>Objective:</strong> ${lab.objective}
+              </p>
+
+              <div class="code-container">
+                <div class="code-header">
+                  <span>Source Code (${lab.language || 'C++'})</span>
+                  <button onclick="copyCode(this)" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.65rem; font-size:0.75rem;">
+                    Copy Code
+                  </button>
+                </div>
+                <pre class="code-pre"><code>${escapeHtml(lab.code)}</code></pre>
+              </div>
+
+              ${lab.output_sample ? `
+                <div style="font-size:0.85rem; font-weight:700; color:var(--accent-emerald); margin-top:1rem;">Output Sample:</div>
+                <div class="output-box">${escapeHtml(lab.output_sample)}</div>
+              ` : ''}
+
+              ${vivaHtml}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-container').querySelector('code');
+      if (codeBlock) {
+        navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+          FTechApp.showToast('Code copied to clipboard!', 'success');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy Code', 2000);
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('labSubjectSelect');
+      loadLabExperiments(select.value);
+
+      select.addEventListener('change', () => {
+        loadLabExperiments(select.value);
+      });
+    });
+  </script>
+</body>
+</html>
