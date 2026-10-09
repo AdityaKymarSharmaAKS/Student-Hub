@@ -126,7 +126,7 @@
     <form id="ftechLoginForm" onsubmit="handleStandaloneLogin(event)">
       <div class="form-group">
         <label for="loginEmail">Email Address or Username *</label>
-        <input type="text" id="loginEmail" class="form-control" placeholder="alok.vishwakarma@college.edu or admin" required>
+        <input type="text" id="loginEmail" class="form-control" placeholder="alok.vishwakarma@college.edu or username" required>
       </div>
 
       <div class="form-group">
@@ -137,10 +137,6 @@
       <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
         Sign In & Enter App
       </button>
-
-      <div style="margin-top: 0.75rem; padding: 0.6rem 0.75rem; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-md); font-size: 0.78rem; color: var(--text-muted); text-align: center;">
-        👑 <strong>Admin Sign-In:</strong> ID: <code>admin</code> (or your Admin email) • Password: <code>ftechadmin2026</code>
-      </div>
 
       <div style="text-align: center; font-size: 0.88rem; color: var(--text-muted); margin-top: 1.25rem;">
         Need an account? <a href="register.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Create one here</a>
@@ -168,9 +164,6 @@
         if (isAdmin) {
           window.location.replace('../admin/dashboard.html');
           return;
-        } else {
-          // If currently logged in as student, show notification so they can choose to sign in as admin or return home
-          FTechApp.showToast(`Signed in as ${user.fullName}. Enter Admin credentials below to switch to Admin Command.`, 'info');
         }
       }
 
