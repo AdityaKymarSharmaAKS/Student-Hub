@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Student Account | F-TECH-Student-Hub</title>
+  <title>Create Verified Student Account | F-TECH-Student-Hub</title>
   <meta name="description" content="Join F-TECH-Student-Hub to access AKTU PYQs, notes, tutorials and lab resources. Founded by Aditya Kumar Sharma (F-TECH).">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem;
       background: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.15), transparent 40%),
                   radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.12), transparent 45%),
                   var(--bg-primary);
@@ -28,11 +28,11 @@
     }
     .auth-card {
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
       border-radius: var(--radius-xl);
-      padding: 2.5rem 2rem;
+      padding: 2.5rem 2.25rem;
       box-shadow: var(--shadow-xl);
       backdrop-filter: blur(16px);
       position: relative;
@@ -45,7 +45,7 @@
     }
     .auth-brand {
       text-align: center;
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.5rem;
     }
     .auth-logo-badge {
       width: 54px;
@@ -58,42 +58,54 @@
       font-size: 1.5rem;
       font-weight: 800;
       color: #fff;
-      margin: 0 auto 1rem;
+      margin: 0 auto 0.75rem;
       box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
     }
     .auth-brand h2 {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.25rem;
       color: var(--text-main);
     }
     [data-theme="light"] .auth-brand h2 {
       color: #0f172a !important;
     }
     .auth-brand p {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
     [data-theme="light"] .auth-brand p {
       color: #334155 !important;
     }
-    .auth-info-box {
+    .auth-security-notice {
       background: rgba(99, 102, 241, 0.08);
-      border: 1px dashed rgba(99, 102, 241, 0.3);
+      border: 1px dashed rgba(99, 102, 241, 0.35);
       border-radius: var(--radius-sm);
-      padding: 0.75rem 1rem;
-      font-size: 0.82rem;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.8rem;
       color: var(--text-main);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
     }
-    [data-theme="light"] .auth-info-box {
+    [data-theme="light"] .auth-security-notice {
       background: #eef2ff !important;
       border: 1px dashed #818cf8 !important;
       color: #1e1b4b !important;
+    }
+    .input-action-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+    [data-theme="light"] .field-hint {
+      color: #64748b;
     }
   </style>
 </head>
@@ -113,28 +125,47 @@
       <p>Company: <strong>F-TECH</strong> • Founder: <strong>Aditya Kumar Sharma</strong></p>
     </div>
 
-    <div class="auth-info-box">
-      <span>ℹ️</span>
-      <span>After registration, you will be redirected to the <strong>Login</strong> page to sign in to the app.</span>
+    <div class="auth-security-notice">
+      <span>🛡️</span>
+      <span><strong>Verified Account:</strong> Real email validation and OTP code verification are enforced.</span>
     </div>
 
     <form id="ftechRegisterForm" onsubmit="handleStandaloneRegister(event)">
-      <div class="form-group">
+      <!-- 1. Full Name -->
+      <div class="form-group" style="margin-bottom: 1rem;">
         <label for="regFullName">Full Name *</label>
         <input type="text" id="regFullName" class="form-control" placeholder="e.g. Alok Vishwakarma" required>
+        <div class="field-hint">Letters and spaces only (minimum 2 characters).</div>
       </div>
 
-      <div class="form-group">
+      <!-- 2. Email Address & Send OTP -->
+      <div class="form-group" style="margin-bottom: 1rem;">
         <label for="regEmail">College or Personal Email *</label>
-        <input type="email" id="regEmail" class="form-control" placeholder="alok.vishwakarma@college.edu" required>
+        <div class="input-action-group">
+          <input type="email" id="regEmail" class="form-control" placeholder="alok.vishwakarma@college.edu" required>
+          <button type="button" id="sendOtpBtn" class="btn btn-secondary btn-sm" onclick="handleSendOtp()" style="white-space: nowrap; padding: 0.5rem 0.85rem; font-weight: 700;">
+            Send Code
+          </button>
+        </div>
+        <div class="field-hint">Must be a valid email with full domain (e.g. .edu, .ac.in, .com).</div>
       </div>
 
-      <div class="form-group">
+      <!-- 3. OTP Code Input -->
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="regOtp">6-Digit Verification Code (OTP) *</label>
+        <input type="text" id="regOtp" class="form-control" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required style="letter-spacing: 0.2em; font-family: var(--font-mono); font-weight: 700;">
+        <div class="field-hint" id="otpStatusHint">Click "Send Code" above to receive your 6-digit verification code.</div>
+      </div>
+
+      <!-- 4. Password -->
+      <div class="form-group" style="margin-bottom: 1rem;">
         <label for="regPassword">Create Password *</label>
-        <input type="password" id="regPassword" class="form-control" placeholder="At least 6 characters" required>
+        <input type="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters (e.g. Pass123)" required>
+        <div class="field-hint">Must contain at least 1 letter and 1 number for account security.</div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <!-- 5. Branch & Semester -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
         <div class="form-group">
           <label for="regBranch">Branch</label>
           <select id="regBranch" class="form-control">
@@ -160,8 +191,9 @@
         </div>
       </div>
 
-      <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
-        Create Account & Proceed to Login
+      <!-- Submit Button -->
+      <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-weight: 700;">
+        Verify Code & Create Account
       </button>
 
       <div style="text-align: center; font-size: 0.88rem; color: var(--text-muted); margin-top: 1.25rem;">
@@ -194,6 +226,67 @@
       }
     });
 
+    // Client-side strict email check
+    function isValidEmail(email) {
+      if (!email) return false;
+      const clean = email.trim().toLowerCase();
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+      if (!regex.test(clean)) return false;
+      const parts = clean.split('@');
+      if (parts.length !== 2) return false;
+      const domainParts = parts[1].split('.');
+      if (domainParts.length < 2) return false;
+      if (domainParts[domainParts.length - 1].length < 2) return false;
+      if (clean.includes('@b') || clean.includes('@a') || clean.includes('@x')) return false;
+      return true;
+    }
+
+    async function handleSendOtp() {
+      const emailInput = document.getElementById('regEmail');
+      const email = emailInput.value.trim();
+      const sendBtn = document.getElementById('sendOtpBtn');
+      const otpHint = document.getElementById('otpStatusHint');
+
+      if (!email) {
+        FTechApp.showToast('Please enter your email address first.', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        FTechApp.showToast('Please enter a real, complete email address with a valid domain (e.g. name@college.edu).', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+
+      const res = await FTechApp.apiCall('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Resend Code';
+
+      if (res.success) {
+        FTechApp.showToast(res.message, 'success');
+        if (otpHint) {
+          otpHint.innerHTML = `<span style="color:var(--accent-emerald); font-weight:700;">✅ Code sent! Check your notification or enter code above.</span>`;
+        }
+        const otpInput = document.getElementById('regOtp');
+        if (res.otp && !otpInput.value) {
+          // Pre-populate or prompt for quick completion
+          otpInput.value = res.otp;
+        }
+        otpInput.focus();
+      } else {
+        FTechApp.showToast(res.message || 'Failed to send verification code', 'error');
+      }
+    }
+
     async function handleStandaloneRegister(e) {
       e.preventDefault();
       const fullName = document.getElementById('regFullName').value.trim();
@@ -201,24 +294,51 @@
       const password = document.getElementById('regPassword').value;
       const branch = document.getElementById('regBranch').value;
       const semester = document.getElementById('regSemester').value;
+      const otp = document.getElementById('regOtp').value.trim();
       const btn = document.getElementById('regSubmitBtn');
 
+      // Validation 1: Name
+      if (fullName.length < 2 || !/^[a-zA-Z\s.']{2,60}$/.test(fullName)) {
+        FTechApp.showToast('Please enter a valid full name with letters only.', 'error');
+        document.getElementById('regFullName').focus();
+        return;
+      }
+
+      // Validation 2: Email
+      if (!isValidEmail(email)) {
+        FTechApp.showToast('Invalid email address. Please use a full real domain (e.g. .edu, .ac.in, .com).', 'error');
+        document.getElementById('regEmail').focus();
+        return;
+      }
+
+      // Validation 3: OTP
+      if (!otp || otp.length !== 6) {
+        FTechApp.showToast('Please enter the 6-digit verification code.', 'error');
+        document.getElementById('regOtp').focus();
+        return;
+      }
+
+      // Validation 4: Password
       if (password.length < 6) {
         FTechApp.showToast('Password must be at least 6 characters.', 'error');
         return;
       }
+      if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+        FTechApp.showToast('Password must contain at least one letter and one number for security.', 'error');
+        return;
+      }
 
       btn.disabled = true;
-      btn.textContent = 'Registering account...';
+      btn.textContent = 'Verifying and creating account...';
 
       const res = await FTechApp.apiCall('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, password, branch, semester })
+        body: JSON.stringify({ fullName, email, password, branch, semester, otp })
       });
 
       btn.disabled = false;
-      btn.textContent = 'Create Account & Proceed to Login';
+      btn.textContent = 'Verify Code & Create Account';
 
       if (res.success) {
         FTechApp.showToast('Account created successfully! Redirecting to login...', 'success');

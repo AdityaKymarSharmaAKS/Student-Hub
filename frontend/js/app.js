@@ -267,11 +267,20 @@ const FTechApp = (() => {
           </div>
           <div class="form-group">
             <label>College / Personal Email *</label>
-            <input type="email" id="regEmail" class="form-control" placeholder="alok.vishwakarma@college.edu" required>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="email" id="regEmail" class="form-control" placeholder="alok.vishwakarma@college.edu" required>
+              <button type="button" id="modalSendOtpBtn" class="btn btn-secondary btn-sm" onclick="FTechApp.sendModalOtp()" style="white-space:nowrap; font-weight:700;">
+                Send Code
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>6-Digit Verification Code (OTP) *</label>
+            <input type="text" id="regOtp" class="form-control" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required style="letter-spacing:0.2em; font-family:var(--font-mono); font-weight:700;">
           </div>
           <div class="form-group">
             <label>Choose Password *</label>
-            <input type="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters" required>
+            <input type="password" id="regPassword" class="form-control" placeholder="At least 6 chars (letters & numbers)" required>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
             <div class="form-group">
@@ -395,6 +404,59 @@ const FTechApp = (() => {
     }
   }
 
+  function isValidEmail(email) {
+    if (!email) return false;
+    const clean = email.trim().toLowerCase();
+    const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    if (!regex.test(clean)) return false;
+    const parts = clean.split('@');
+    if (parts.length !== 2) return false;
+    const domainParts = parts[1].split('.');
+    if (domainParts.length < 2) return false;
+    if (domainParts[domainParts.length - 1].length < 2) return false;
+    if (clean.includes('@b') || clean.includes('@a') || clean.includes('@x')) return false;
+    return true;
+  }
+
+  async function sendModalOtp() {
+    const emailInput = document.getElementById('regEmail');
+    const email = emailInput ? emailInput.value.trim() : '';
+    const btn = document.getElementById('modalSendOtpBtn');
+
+    if (!email || !isValidEmail(email)) {
+      showToast('Please enter a valid, complete email address (e.g. name@college.edu).', 'error');
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+    }
+
+    const res = await apiCall('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Resend Code';
+    }
+
+    if (res.success) {
+      showToast(res.message, 'success');
+      const otpInput = document.getElementById('regOtp');
+      if (otpInput) {
+        if (res.otp && !otpInput.value) otpInput.value = res.otp;
+        otpInput.focus();
+      }
+    } else {
+      showToast(res.message || 'Failed to send verification code', 'error');
+    }
+  }
+
   async function handleRegister(e) {
     e.preventDefault();
     const fullName = document.getElementById('regFullName').value.trim();
@@ -402,20 +464,33 @@ const FTechApp = (() => {
     const password = document.getElementById('regPassword').value;
     const branch = document.getElementById('regBranch').value;
     const semester = document.getElementById('regSemester').value;
+    const otpInput = document.getElementById('regOtp');
+    const otp = otpInput ? otpInput.value.trim() : '';
     const btn = document.getElementById('regSubmitBtn');
 
-    if (password.length < 6) {
-      showToast('Password must be at least 6 characters.', 'error');
+    if (!isValidEmail(email)) {
+      showToast('Please enter a real email address with a valid domain (e.g. name@college.edu).', 'error');
+      return;
+    }
+
+    if (!otp || otp.length !== 6) {
+      showToast('Please enter the 6-digit verification code. Click "Send Code" to get it.', 'error');
+      if (otpInput) otpInput.focus();
+      return;
+    }
+
+    if (password.length < 6 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      showToast('Password must be at least 6 characters and contain at least one letter and one number.', 'error');
       return;
     }
 
     btn.disabled = true;
-    btn.textContent = 'Creating account...';
+    btn.textContent = 'Verifying and creating account...';
 
     const res = await apiCall('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, email, password, branch, semester })
+      body: JSON.stringify({ fullName, email, password, branch, semester, otp })
     });
 
     btn.disabled = false;
@@ -494,6 +569,7 @@ const FTechApp = (() => {
     switchAuthTab,
     handleLogin,
     handleRegister,
+    sendModalOtp,
     enforceAuthGuard
   };
 })();

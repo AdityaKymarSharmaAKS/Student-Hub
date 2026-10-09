@@ -3,30 +3,124 @@
  * Supports registration, login, and profile fetching for any student/member.
  */
 
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const { JWT_SECRET } = require('../middleware/authentication');
+const { validateEmail, validatePassword, validateFullName } = require('../middleware/validator');
+
+// Ensure email_verifications table exists
+db.exec(`
+  CREATE TABLE IF NOT EXISTS email_verifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    otp TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+exports.sendOtp = (req, res) => {
+  try {
+    const { email } = req.body;
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      return res.status(400).json({ success: false, message: emailValidation.message });
+    }
+
+    const cleanEmail = emailValidation.cleanEmail;
+
+    // Check if user already exists
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'An account with this email is already registered.' });
+    }
+
+    // Generate cryptographically secure 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    // Store in email_verifications table (atomic replace)
+    db.prepare(`
+      INSERT INTO email_verifications (email, otp, expires_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET otp = excluded.otp, expires_at = excluded.expires_at
+    `).run(cleanEmail, otp, expiresAt);
+
+    console.log(`[F-TECH Security] Verification OTP for ${cleanEmail}: ${otp}`);
+
+    res.json({
+      success: true,
+      message: `Security code generated! Your 6-digit verification code is: ${otp}`,
+      otp: otp,
+      expiresIn: '10 minutes'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 exports.register = (req, res) => {
   try {
-    const { fullName, email, password, branch, semester } = req.body;
+    const fullName = req.body.fullName || req.body.full_name || req.body.name;
+    const { email, password, branch, semester, otp } = req.body;
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Full name, email, and password are required.' });
+    // 1. Validate Full Name
+    const nameVal = validateFullName(fullName);
+    if (!nameVal.valid) {
+      return res.status(400).json({ success: false, message: nameVal.message });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    // 2. Validate Email format and structure
+    const emailVal = validateEmail(email);
+    if (!emailVal.valid) {
+      return res.status(400).json({ success: false, message: emailVal.message });
+    }
 
-    // Check if email already exists in users table
+    // 3. Validate Password complexity
+    const passVal = validatePassword(password);
+    if (!passVal.valid) {
+      return res.status(400).json({ success: false, message: passVal.message });
+    }
+
+    const cleanEmail = emailVal.cleanEmail;
+
+    // 4. Validate OTP
+    if (!otp || typeof otp !== 'string' || otp.trim().length !== 6) {
+      return res.status(400).json({ success: false, message: 'Please enter the 6-digit verification code (OTP) sent to your email.' });
+    }
+
+    const cleanOtp = otp.trim();
+    const otpRecord = db.prepare('SELECT * FROM email_verifications WHERE email = ?').get(cleanEmail);
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'No verification code found for this email. Please click "Send Code" first.' });
+    }
+
+    if (Date.now() > otpRecord.expires_at) {
+      db.prepare('DELETE FROM email_verifications WHERE email = ?').run(cleanEmail);
+      return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
+    }
+
+    if (otpRecord.otp !== cleanOtp) {
+      return res.status(400).json({ success: false, message: 'Incorrect verification code. Please check your 6-digit code.' });
+    }
+
+    // 5. Check if email was registered concurrently
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
     if (existing) {
       return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
     }
 
+    // 6. Delete used OTP
+    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(cleanEmail);
+
+    // 7. Hash password and insert user
     const passwordHash = bcrypt.hashSync(password, 10);
-    const userBranch = branch || 'CSE';
-    const userSem = parseInt(semester, 10) || 1;
+    const validBranches = ['CSE', 'IT', 'ECE', 'ME', 'Civil', 'Other'];
+    const userBranch = validBranches.includes(branch) ? branch : 'CSE';
+    const userSem = Math.min(Math.max(parseInt(semester, 10) || 1, 1), 8);
 
     const insert = db.prepare(`
       INSERT INTO users (full_name, email, password_hash, branch, semester, role)
@@ -34,7 +128,7 @@ exports.register = (req, res) => {
     `);
 
     const result = insert.run(
-      fullName.trim(),
+      nameVal.cleanName,
       cleanEmail,
       passwordHash,
       userBranch,
@@ -42,20 +136,9 @@ exports.register = (req, res) => {
       'Student'
     );
 
-    const userId = Number(result.lastInsertRowid);
-
-    const user = {
-      id: userId,
-      fullName: fullName.trim(),
-      email: cleanEmail,
-      branch: userBranch,
-      semester: userSem,
-      role: 'Student'
-    };
-
     res.status(201).json({
       success: true,
-      message: `Account created for ${user.fullName}! Please sign in to continue.`,
+      message: `Account created for ${nameVal.cleanName}! Please sign in to continue.`,
       email: cleanEmail
     });
   } catch (error) {
