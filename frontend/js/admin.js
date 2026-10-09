@@ -30,12 +30,12 @@ async function handleAdminLogin(event) {
   if (res.success && res.token) {
     localStorage.setItem('ftech_admin_token', res.token);
     localStorage.setItem('ftech_admin_user', JSON.stringify(res.admin));
-    localStorage.setItem('ftech_user', JSON.stringify({ fullName: res.admin.fullName, role: 'SuperAdmin' }));
+    localStorage.setItem('ftech_user', JSON.stringify({ fullName: res.admin.fullName, role: 'SuperAdmin', isAdmin: true }));
     localStorage.setItem('ftech_token', res.token);
-    FTechApp.showToast(`Welcome back, ${res.admin.fullName}!`, 'success');
+    FTechApp.showToast(`Welcome Administrator, ${res.admin.fullName}!`, 'success');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 800);
+    }, 600);
   } else {
     loginBtn.disabled = false;
     loginBtn.textContent = 'Sign In to F-TECH Admin';
@@ -45,9 +45,18 @@ async function handleAdminLogin(event) {
 
 // Check admin auth state
 function checkAdminAuth() {
-  const token = localStorage.getItem('ftech_admin_token');
-  if (!token) {
-    window.location.href = 'login.html';
+  const adminToken = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
+  const user = JSON.parse(localStorage.getItem('ftech_user') || '{}');
+  const adminUser = JSON.parse(localStorage.getItem('ftech_admin_user') || '{}');
+
+  const role = ((user.role || '') + ' ' + (adminUser.role || '')).toLowerCase();
+  const isAdmin = role.includes('admin') || user.isAdmin === true || adminUser.isAdmin === true;
+
+  if (!adminToken || !isAdmin) {
+    FTechApp.showToast('Administrator privileges required. Please sign in with your Admin ID.', 'error');
+    setTimeout(() => {
+      window.location.href = '../pages/login.html';
+    }, 400);
     return false;
   }
   return true;
@@ -57,20 +66,22 @@ function checkAdminAuth() {
 function adminLogout() {
   localStorage.removeItem('ftech_admin_token');
   localStorage.removeItem('ftech_admin_user');
+  localStorage.removeItem('ftech_token');
+  localStorage.removeItem('ftech_user');
   FTechApp.showToast('Logged out from F-TECH Admin', 'info');
   setTimeout(() => {
-    window.location.href = 'login.html';
-  }, 600);
+    window.location.href = '../pages/login.html';
+  }, 400);
 }
 
 // Load Admin Dashboard Data
 async function loadAdminDashboard() {
   if (!checkAdminAuth()) return;
 
-  const user = JSON.parse(localStorage.getItem('ftech_admin_user') || '{}');
+  const user = JSON.parse(localStorage.getItem('ftech_admin_user') || localStorage.getItem('ftech_user') || '{}');
   const adminNameEl = document.getElementById('adminDisplayName');
   if (adminNameEl) {
-    adminNameEl.textContent = user.fullName || 'Aditya Kumar Sharma';
+    adminNameEl.textContent = user.fullName || user.name || 'Aditya Kumar Sharma';
   }
 
   // 1. Fetch Stats

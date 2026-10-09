@@ -97,7 +97,7 @@ const FTechApp = (() => {
     }
     if (token) {
       localStorage.setItem('ftech_token', token);
-      if (user && (user.role === 'SuperAdmin' || user.role === 'Admin')) {
+      if (user && (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin)) {
         localStorage.setItem('ftech_admin_token', token);
         localStorage.setItem('ftech_admin_user', JSON.stringify(user));
       }
@@ -148,12 +148,22 @@ const FTechApp = (() => {
 
     if (userSlot) {
       if (user) {
+        const isAdmin = user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin;
+        const rawPath = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+        const adminHref = rawPath.includes('/pages/') ? '../admin/dashboard.html' : 'admin/dashboard.html';
+
         userSlot.innerHTML = `
+          ${isAdmin ? `
+            <a href="${adminHref}" class="btn btn-sm" style="background:linear-gradient(135deg, #f59e0b, #ef4444); color:#fff; font-weight:700; text-decoration:none; padding:0.35rem 0.75rem; border-radius:var(--radius-full); display:inline-flex; align-items:center; gap:0.35rem; box-shadow:0 4px 12px rgba(239,68,68,0.3);" title="Access Admin Command Center">
+              👑 Admin Panel
+            </a>
+          ` : ''}
           <div class="user-profile-badge" style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(99,102,241,0.12); padding:0.35rem 0.75rem; border-radius:var(--radius-full); border:1px solid rgba(99,102,241,0.25);">
             <div style="width:28px; height:28px; border-radius:50%; background:var(--grad-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800;">
               ${getInitials(user.fullName)}
             </div>
             <span style="font-size:0.85rem; font-weight:700; color:var(--text-main);">${user.fullName}</span>
+            ${isAdmin ? `<span style="font-size:0.7rem; background:rgba(245,158,11,0.2); color:#f59e0b; padding:0.1rem 0.4rem; border-radius:4px; font-weight:800;">ADMIN</span>` : ''}
             <button onclick="FTechApp.logout()" class="btn-sm" style="background:none; border:none; cursor:pointer; font-size:0.75rem; color:var(--accent-rose); padding:0 0.2rem;" title="Sign Out">
               ✕
             </button>
@@ -168,7 +178,36 @@ const FTechApp = (() => {
       }
     }
 
-    // 2. Sidebar profile card
+    // 2. Sidebar dynamic admin command link
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (sidebarNav) {
+      const existingAdminLink = document.getElementById('adminSidebarLink');
+      const isAdmin = user && (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin);
+      const rawPath = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+      const adminHref = rawPath.includes('/pages/') ? '../admin/dashboard.html' : 'admin/dashboard.html';
+
+      if (isAdmin && !existingAdminLink) {
+        const adminItem = document.createElement('a');
+        adminItem.id = 'adminSidebarLink';
+        adminItem.href = adminHref;
+        adminItem.className = 'nav-item';
+        adminItem.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15))';
+        adminItem.style.border = '1px solid rgba(245, 158, 11, 0.35)';
+        adminItem.style.color = '#f59e0b';
+        adminItem.style.fontWeight = '700';
+        adminItem.style.marginTop = '0.5rem';
+        adminItem.innerHTML = `
+          <span style="font-size:1.15rem;">👑</span>
+          <span>Admin Command</span>
+          <span class="nav-badge" style="background:#ef4444; color:#fff;">MASTER</span>
+        `;
+        sidebarNav.appendChild(adminItem);
+      } else if (!isAdmin && existingAdminLink) {
+        existingAdminLink.remove();
+      }
+    }
+
+    // 3. Sidebar profile card
     const sidebarFounderCard = document.querySelector('.sidebar-founder-card');
     if (sidebarFounderCard) {
       if (user) {
@@ -542,14 +581,13 @@ const FTechApp = (() => {
         return false;
       }
     } else {
-      // 2. If logged in and on login/register page, send to appropriate area
+      // 2. If logged in and on login/register page, only auto-redirect if already SuperAdmin
       if (isLoginOrReg) {
         if (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin) {
           window.location.replace('../admin/dashboard.html');
-        } else {
-          window.location.replace('../index.html');
+          return false;
         }
-        return false;
+        // If logged in as student, allow them to view login page so they can sign in as Admin
       }
     }
     return true;

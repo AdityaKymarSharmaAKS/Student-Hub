@@ -138,6 +138,10 @@
         Sign In & Enter App
       </button>
 
+      <div style="margin-top: 0.75rem; padding: 0.6rem 0.75rem; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-md); font-size: 0.78rem; color: var(--text-muted); text-align: center;">
+        👑 <strong>Admin Sign-In:</strong> ID: <code>admin</code> (or your Admin email) • Password: <code>ftechadmin2026</code>
+      </div>
+
       <div style="text-align: center; font-size: 0.88rem; color: var(--text-muted); margin-top: 1.25rem;">
         Need an account? <a href="register.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Create one here</a>
       </div>
@@ -157,16 +161,16 @@
     document.addEventListener('DOMContentLoaded', () => {
       FTechApp.initTheme();
 
-      // If user is already authenticated, redirect into their area
       const user = FTechApp.getCurrentUser();
       const token = localStorage.getItem('ftech_token');
       if (user && token) {
-        if (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin) {
+        const isAdmin = user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin;
+        if (isAdmin) {
           window.location.replace('../admin/dashboard.html');
           return;
         } else {
-          window.location.replace('../index.html');
-          return;
+          // If currently logged in as student, show notification so they can choose to sign in as admin or return home
+          FTechApp.showToast(`Signed in as ${user.fullName}. Enter Admin credentials below to switch to Admin Command.`, 'info');
         }
       }
 
@@ -211,12 +215,14 @@
 
       if (res.success && res.user) {
         FTechApp.setCurrentUser(res.user, res.token);
-        const isAdmin = res.isAdmin || res.user.role === 'SuperAdmin' || res.user.role === 'Admin';
+        const isAdmin = res.isAdmin === true || res.user.role === 'SuperAdmin' || res.user.role === 'Admin';
 
         if (isAdmin) {
           localStorage.setItem('ftech_admin_token', res.token);
           localStorage.setItem('ftech_admin_user', JSON.stringify(res.user));
-          FTechApp.showToast(`Welcome Administrator, ${res.user.fullName}! Opening Governance Panel...`, 'success');
+          localStorage.setItem('ftech_user', JSON.stringify(res.user));
+          localStorage.setItem('ftech_token', res.token);
+          FTechApp.showToast(`Welcome Administrator, ${res.user.fullName}! Opening Admin Dashboard...`, 'success');
           setTimeout(() => {
             window.location.href = '../admin/dashboard.html';
           }, 500);
