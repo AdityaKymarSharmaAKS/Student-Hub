@@ -39,10 +39,17 @@ function renderDocumentCards(docs) {
   if (!container) return;
 
   if (docs.length === 0) {
+    const isPages = window.location.pathname.includes('pages');
     container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
-        <h4 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Documents Found</h4>
-        <p style="color: var(--text-muted);">No notes or papers match your filter criteria. Try resetting filters.</p>
+      <div style="grid-column: 1/-1; text-align: center; padding: 4.5rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📂</div>
+        <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">No Documents Uploaded Yet</h4>
+        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.5rem;">
+          Verified study notes and AKTU previous year question papers will appear here as soon as they are uploaded.
+        </p>
+        <button onclick="typeof FTechUploads !== 'undefined' ? FTechUploads.openModal() : (window.location.href='${isPages ? '../index.html' : 'index.html'}')" class="btn btn-primary btn-sm">
+          + Upload Material
+        </button>
       </div>
     `;
     return;

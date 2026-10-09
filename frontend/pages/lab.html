@@ -204,9 +204,6 @@
           <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Lab Course:</div>
           <select id="labSubjectSelect" class="filter-select">
             <option value="">All Practical Courses</option>
-            <option value="KCS-301" selected>KCS-301: Data Structures Lab</option>
-            <option value="KCS-401">KCS-401: Operating Systems Lab</option>
-            <option value="KCS-503">KCS-503: Web Technology Lab</option>
           </select>
         </div>
 
@@ -238,7 +235,16 @@
 
       if (res.success && res.data) {
         if (res.data.length === 0) {
-          container.innerHTML = '<div style="text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg);"><p>No lab experiments found for this subject code.</p></div>';
+          container.innerHTML = `
+            <div style="text-align:center; padding:4rem 2rem; background:var(--bg-card); border-radius:var(--radius-lg); border: 1px dashed var(--border-glass);">
+              <div style="font-size:2.5rem; margin-bottom:0.75rem;">🧪</div>
+              <h4 style="font-size:1.25rem; font-weight:700; margin-bottom:0.5rem;">No Lab Experiments Uploaded Yet</h4>
+              <p style="color:var(--text-muted); font-size:0.95rem; max-width:480px; margin:0 auto 1.5rem;">
+                Laboratory source codes and viva voce questions will appear here once practical manuals are added to this course.
+              </p>
+              <a href="../index.html" class="btn btn-primary btn-sm">+ Upload Lab Manual</a>
+            </div>
+          `;
           return;
         }
 
@@ -315,8 +321,18 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    async function initLabSubjects() {
       const select = document.getElementById('labSubjectSelect');
+      const res = await FTechApp.apiCall('/api/subjects');
+      if (res && res.success && res.data && res.data.length > 0) {
+        select.innerHTML = '<option value="">All Practical Courses</option>' + 
+          res.data.map(s => `<option value="${s.code}">${s.code}: ${s.title}</option>`).join('');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const select = document.getElementById('labSubjectSelect');
+      await initLabSubjects();
       loadLabExperiments(select.value);
 
       select.addEventListener('change', () => {

@@ -88,10 +88,10 @@ async function loadAdminDashboard() {
   const statsRes = await FTechApp.apiCall('/api/admin/stats');
   if (statsRes.success && statsRes.stats) {
     const s = statsRes.stats;
-    if (document.getElementById('statTotalDocs')) document.getElementById('statTotalDocs').textContent = s.documentsCount;
-    if (statsRes.stats.papersCount && document.getElementById('statTotalPapers')) document.getElementById('statTotalPapers').textContent = s.papersCount;
-    if (document.getElementById('statTotalDownloads')) document.getElementById('statTotalDownloads').textContent = s.totalDownloads.toLocaleString();
-    if (document.getElementById('statTotalSubjects')) document.getElementById('statTotalSubjects').textContent = s.subjectsCount;
+    if (document.getElementById('statTotalDocs')) document.getElementById('statTotalDocs').textContent = s.documentsCount ?? 0;
+    if (document.getElementById('statTotalPapers')) document.getElementById('statTotalPapers').textContent = s.papersCount ?? 0;
+    if (document.getElementById('statTotalDownloads')) document.getElementById('statTotalDownloads').textContent = (s.totalDownloads ?? 0).toLocaleString();
+    if (document.getElementById('statTotalSubjects')) document.getElementById('statTotalSubjects').textContent = s.subjectsCount ?? 0;
   }
 
   // 2. Fetch Document Table

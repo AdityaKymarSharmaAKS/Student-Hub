@@ -168,21 +168,21 @@
           <div class="stat-widget">
             <div class="stat-icon indigo">📚</div>
             <div>
-              <div class="stat-number">10+</div>
+              <div id="statHomeSubjects" class="stat-number">10</div>
               <div class="stat-label">Core AKTU Subjects</div>
             </div>
           </div>
           <div class="stat-widget">
             <div class="stat-icon cyan">📑</div>
             <div>
-              <div class="stat-number">100%</div>
+              <div id="statHomeDocs" class="stat-number">0</div>
               <div class="stat-label">Verified PYQs & Notes</div>
             </div>
           </div>
           <div class="stat-widget">
             <div class="stat-icon emerald">⚡</div>
             <div>
-              <div class="stat-number">25,000+</div>
+              <div id="statHomeDownloads" class="stat-number">0</div>
               <div class="stat-label">Student Downloads</div>
             </div>
           </div>
@@ -357,7 +357,21 @@
   <script src="js/documents.js"></script>
   <script src="js/uploads.js"></script>
   <script>
+    async function loadHomeStats() {
+      const res = await FTechApp.apiCall('/api/stats');
+      if (res && res.success && res.stats) {
+        const s = res.stats;
+        const subEl = document.getElementById('statHomeSubjects');
+        const docEl = document.getElementById('statHomeDocs');
+        const dlEl = document.getElementById('statHomeDownloads');
+        if (subEl) subEl.textContent = s.subjectsCount ?? 0;
+        if (docEl) docEl.textContent = s.documentsCount ?? 0;
+        if (dlEl) dlEl.textContent = (s.totalDownloads ?? 0).toLocaleString();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      loadHomeStats();
       loadSubjects({ limit: 6 });
       loadDocuments({ limit: 6 });
     });

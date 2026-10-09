@@ -40,6 +40,35 @@ app.use('/api/documents', require('./routes/documents'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/admin', require('./routes/admin'));
 
+// Public Stats Endpoint
+app.get('/api/stats', (req, res) => {
+  try {
+    const db = require('./config/database');
+    const subjectsCount = db.prepare('SELECT COUNT(*) as count FROM subjects').get().count || 0;
+    const documentsCount = db.prepare('SELECT COUNT(*) as count FROM documents WHERE is_approved = 1').get().count || 0;
+    const totalDownloads = db.prepare('SELECT SUM(downloads_count) as total FROM documents').get().total || 0;
+    const totalViews = db.prepare('SELECT SUM(views_count) as total FROM documents').get().total || 0;
+    const papersCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'aktu-paper' AND is_approved = 1").get().count || 0;
+    const notesCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'notes' AND is_approved = 1").get().count || 0;
+
+    res.json({
+      success: true,
+      stats: {
+        subjectsCount,
+        documentsCount,
+        totalDownloads,
+        totalViews,
+        papersCount,
+        notesCount,
+        company: 'F-TECH',
+        founder: 'Aditya Kumar Sharma'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // API Health & Metadata Check
 app.get('/api/health', (req, res) => {
   res.json({
