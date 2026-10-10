@@ -1034,17 +1034,19 @@ body::after {
   color: #0f172a !important;
 }
 
+[data-theme="light"] .btn-secondary,
 [data-theme="light"] .hero-actions .btn-secondary {
   background: #ffffff !important;
-  border: 1px solid rgba(99, 102, 241, 0.25) !important;
-  color: #1e293b !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
+[data-theme="light"] .btn-secondary:hover,
 [data-theme="light"] .hero-actions .btn-secondary:hover {
-  background: #f8fafc !important;
-  border-color: #6366f1 !important;
-  color: #4338ca !important;
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
 }
 
@@ -1204,5 +1206,157 @@ body::after {
 
 [data-theme="light"] .footer-bottom {
   color: #64748b !important;
+}
+
+/* --------------------------------------------------------------------------
+   13. COMPREHENSIVE LIGHT MODE TYPOGRAPHY & ELEMENT VISIBILITY
+   Ensures 100% crystal-clear readable dark text across every page
+   -------------------------------------------------------------------------- */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] p {
+  color: #334155 !important;
+}
+
+[data-theme="light"] strong,
+[data-theme="light"] b {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .section-title,
+[data-theme="light"] .section-title * {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .section-subtitle {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .card-code {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] .card-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .card-desc {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .card-footer span {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .download-counter {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .download-counter strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .admin-tab-btn {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .admin-tab-btn:hover {
+  color: #0f172a !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .admin-tab-btn.active {
+  color: #0284c7 !important;
+  border-bottom-color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.08) !important;
+}
+
+[data-theme="light"] .tab-badge {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .admin-topbar h1 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .table-header-bar h3 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .table-header-bar p {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .admin-table th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .admin-table td {
+  color: #0f172a !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+[data-theme="light"] .admin-table td strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .admin-table td div {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .form-group label {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .modal-header h3 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .modal-close {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .modal-close:hover {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] #fileDropZone p {
+  color: #475569 !important;
+}
+
+[data-theme="light"] select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .post-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .post-preview,
+[data-theme="light"] .post-content,
+[data-theme="light"] .answer-content {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .post-author,
+[data-theme="light"] .post-meta,
+[data-theme="light"] .post-meta span {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .vote-count {
+  color: #0f172a !important;
 }
 

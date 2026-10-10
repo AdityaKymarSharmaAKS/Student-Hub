@@ -112,72 +112,9 @@
         </div>
 
         <div id="tutorialsGrid" class="cards-grid">
-          <!-- Tutorial 1 -->
-          <div class="card-item">
-            <div class="card-header">
-              <div class="card-icon" style="color: var(--accent-purple); background: rgba(168, 85, 247, 0.15);">
-                ▶
-              </div>
-              <span class="badge-tag badge-sem">KCS-301 • 12 Videos</span>
-            </div>
-            <div class="card-code">Data Structures & Algorithms</div>
-            <h3 class="card-title">Complete DSA Zero to Hero Masterclass</h3>
-            <p class="card-desc">Arrays, Linked Lists, Stacks, Queues, Binary Trees, AVL Rotations, Graph traversals (BFS/DFS), and AKTU 10-marker derivations.</p>
-            <div class="card-footer">
-              <span style="font-size:0.8rem; color:var(--text-dim);">By F-TECH Engineering Wing</span>
-              <a href="https://www.youtube.com/results?search_query=aktu+data+structures+kcs+301" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
-            </div>
-          </div>
-
-          <!-- Tutorial 2 -->
-          <div class="card-item">
-            <div class="card-header">
-              <div class="card-icon" style="color: var(--secondary); background: rgba(6, 182, 212, 0.15);">
-                ▶
-              </div>
-              <span class="badge-tag badge-sem">KCS-401 • 10 Videos</span>
-            </div>
-            <div class="card-code">Operating Systems</div>
-            <h3 class="card-title">OS Concepts, Numericals & Scheduling</h3>
-            <p class="card-desc">Process Synchronization, Semaphores, Peterson's algorithm, Banker's Deadlock Avoidance, Page Replacement (FIFO, LRU, Optimal).</p>
-            <div class="card-footer">
-              <span style="font-size:0.8rem; color:var(--text-dim);">By Aditya Kumar Sharma</span>
-              <a href="https://www.youtube.com/results?search_query=aktu+operating+system+kcs+401" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
-            </div>
-          </div>
-
-          <!-- Tutorial 3 -->
-          <div class="card-item">
-            <div class="card-header">
-              <div class="card-icon" style="color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15);">
-                ▶
-              </div>
-              <span class="badge-tag badge-sem">KCS-503 • 8 Videos</span>
-            </div>
-            <div class="card-code">Web Technology</div>
-            <h3 class="card-title">Full Stack Web Development & Node.js</h3>
-            <p class="card-desc">Building client-server architectures, RESTful APIs with Express, JWT sessions, asynchronous JavaScript, and database integration.</p>
-            <div class="card-footer">
-              <span style="font-size:0.8rem; color:var(--text-dim);">By F-TECH Tech Lab</span>
-              <a href="https://www.youtube.com/results?search_query=aktu+web+technology+kcs+503" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
-            </div>
-          </div>
-
-          <!-- Tutorial 4 -->
-          <div class="card-item">
-            <div class="card-header">
-              <div class="card-icon" style="color: var(--accent-amber); background: rgba(245, 158, 11, 0.15);">
-                ▶
-              </div>
-              <span class="badge-tag badge-sem">BAS-103 • 14 Videos</span>
-            </div>
-            <div class="card-code">Engineering Mathematics I</div>
-            <h3 class="card-title">Matrices, Eigenvalues & Calculus</h3>
-            <p class="card-desc">Cayley-Hamilton Theorem, Rank of Matrix, Partial differentiation, Euler's theorem for homogeneous functions, Taylor & Maclaurin series.</p>
-            <div class="card-footer">
-              <span style="font-size:0.8rem; color:var(--text-dim);">AKTU 1st Year Core</span>
-              <a href="https://www.youtube.com/results?search_query=aktu+maths+1+bas+103" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
-            </div>
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+            <div class="spinner" style="margin-bottom: 1rem;">⚡</div>
+            <p>Loading F-TECH video tutorials & masterclasses...</p>
           </div>
         </div>
       </main>
@@ -195,18 +132,32 @@
   <script src="../js/app.js"></script>
   <script src="../js/navigation.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    async function loadUserTutorials() {
+      const grid = document.getElementById('tutorialsGrid');
+      if (!grid) return;
       try {
         const res = await FTechApp.apiCall('/api/tutorials');
-        if (res && res.success && res.data && res.data.length > 0) {
-          const grid = document.getElementById('tutorialsGrid');
-          if (!grid) return;
+        if (res && res.success) {
+          if (!res.data || res.data.length === 0) {
+            grid.innerHTML = `
+              <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎬</div>
+                <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">No Video Tutorials Found</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto;">
+                  Tutorial playlists curated by F-TECH will appear here as soon as they are added by administrators.
+                </p>
+              </div>
+            `;
+            return;
+          }
+
           const colors = [
             { icon: 'var(--accent-purple)', bg: 'rgba(168, 85, 247, 0.15)' },
             { icon: 'var(--secondary)', bg: 'rgba(6, 182, 212, 0.15)' },
             { icon: 'var(--accent-emerald)', bg: 'rgba(16, 185, 129, 0.15)' },
             { icon: 'var(--accent-amber)', bg: 'rgba(245, 158, 11, 0.15)' }
           ];
+
           grid.innerHTML = res.data.map((tut, i) => {
             const c = colors[i % colors.length];
             return `
@@ -227,11 +178,19 @@
               </div>
             `;
           }).join('');
+        } else {
+          grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--accent-rose);">
+              <p>Failed to load video tutorials. Please refresh.</p>
+            </div>
+          `;
         }
       } catch (err) {
         console.error('Failed to load dynamic tutorials:', err);
       }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUserTutorials);
   </script>
 </body>
 </html>

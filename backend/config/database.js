@@ -126,60 +126,71 @@ function seedDatabase() {
     console.log('[F-TECH-Student-Hub] Default admin account initialized.');
   }
 
-  // 3. Seed Default Tutorials if empty
-  const tutCount = db.prepare('SELECT COUNT(*) as count FROM tutorials').get().count;
-  if (tutCount === 0) {
-    console.log('[F-TECH-Student-Hub] Seeding initial tutorials...');
-    const insertTut = db.prepare(`
-      INSERT INTO tutorials (title, subject_code, subject_title, semester, video_count, instructor, video_url, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    const initialTutorials = [
-      [
-        'Complete DSA Zero to Hero Masterclass',
-        'KCS-301',
-        'Data Structures & Algorithms',
-        3,
-        12,
-        'By F-TECH Engineering Wing',
-        'https://www.youtube.com/results?search_query=aktu+data+structures+kcs+301',
-        'Arrays, Linked Lists, Stacks, Queues, Binary Trees, AVL Rotations, Graph traversals (BFS/DFS), and AKTU 10-marker derivations.'
-      ],
-      [
-        'OS Concepts, Numericals & Scheduling',
-        'KCS-401',
-        'Operating Systems',
-        4,
-        10,
-        'By Aditya Kumar Sharma',
-        'https://www.youtube.com/results?search_query=aktu+operating+system+kcs+401',
-        'Process Synchronization, Semaphores, Peterson\'s algorithm, Banker\'s Deadlock Avoidance, Page Replacement (FIFO, LRU, Optimal).'
-      ],
-      [
-        'Full Stack Web Development & Node.js',
-        'KCS-503',
-        'Web Technology',
-        5,
-        8,
-        'By F-TECH Tech Lab',
-        'https://www.youtube.com/results?search_query=aktu+web+technology+kcs+503',
-        'Building client-server architectures, RESTful APIs with Express, JWT sessions, asynchronous JavaScript, and database integration.'
-      ],
-      [
-        'Matrices, Eigenvalues & Calculus',
-        'BAS-103',
-        'Engineering Mathematics I',
-        1,
-        14,
-        'AKTU 1st Year Core',
-        'https://www.youtube.com/results?search_query=aktu+maths+1+bas+103',
-        'Cayley-Hamilton Theorem, Rank of Matrix, Partial differentiation, Euler\'s theorem for homogeneous functions, Taylor & Maclaurin series.'
-      ]
-    ];
-    for (const t of initialTutorials) {
-      insertTut.run(...t);
+  // 3. Seed Default Tutorials only once on initial platform initialization
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS system_metadata (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )
+  `);
+
+  const tutInit = db.prepare("SELECT value FROM system_metadata WHERE key = 'tutorials_seeded'").get();
+  if (!tutInit) {
+    const tutCount = db.prepare('SELECT COUNT(*) as count FROM tutorials').get().count;
+    if (tutCount === 0) {
+      console.log('[F-TECH-Student-Hub] Initializing default academic tutorials...');
+      const insertTut = db.prepare(`
+        INSERT INTO tutorials (title, subject_code, subject_title, semester, video_count, instructor, video_url, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      const initialTutorials = [
+        [
+          'Complete DSA Zero to Hero Masterclass',
+          'KCS-301',
+          'Data Structures & Algorithms',
+          3,
+          12,
+          'By F-TECH Engineering Wing',
+          'https://www.youtube.com/results?search_query=aktu+data+structures+kcs+301',
+          'Arrays, Linked Lists, Stacks, Queues, Binary Trees, AVL Rotations, Graph traversals (BFS/DFS), and AKTU 10-marker derivations.'
+        ],
+        [
+          'OS Concepts, Numericals & Scheduling',
+          'KCS-401',
+          'Operating Systems',
+          4,
+          10,
+          'By Aditya Kumar Sharma',
+          'https://www.youtube.com/results?search_query=aktu+operating+system+kcs+401',
+          'Process Synchronization, Semaphores, Peterson\'s algorithm, Banker\'s Deadlock Avoidance, Page Replacement (FIFO, LRU, Optimal).'
+        ],
+        [
+          'Full Stack Web Development & Node.js',
+          'KCS-503',
+          'Web Technology',
+          5,
+          8,
+          'By F-TECH Tech Lab',
+          'https://www.youtube.com/results?search_query=aktu+web+technology+kcs+503',
+          'Building client-server architectures, RESTful APIs with Express, JWT sessions, asynchronous JavaScript, and database integration.'
+        ],
+        [
+          'Matrices, Eigenvalues & Calculus',
+          'BAS-103',
+          'Engineering Mathematics I',
+          1,
+          14,
+          'AKTU 1st Year Core',
+          'https://www.youtube.com/results?search_query=aktu+maths+1+bas+103',
+          'Cayley-Hamilton Theorem, Rank of Matrix, Partial differentiation, Euler\'s theorem for homogeneous functions, Taylor & Maclaurin series.'
+        ]
+      ];
+      for (const t of initialTutorials) {
+        insertTut.run(...t);
+      }
+      console.log('[F-TECH-Student-Hub] Tutorials seeded successfully.');
     }
-    console.log('[F-TECH-Student-Hub] Tutorials seeded successfully.');
+    db.prepare("INSERT OR REPLACE INTO system_metadata (key, value) VALUES ('tutorials_seeded', 'true')").run();
   }
 }
 

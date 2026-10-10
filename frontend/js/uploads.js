@@ -111,8 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.innerHTML = 'Uploading to F-TECH...';
 
       try {
+        const token = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch(`${FTechApp.API_BASE}/api/documents/upload`, {
           method: 'POST',
+          headers,
           body: formData
         });
 
