@@ -6,6 +6,19 @@
  * ==========================================================================
  */
 
+// Safe HTML escape helper fallback
+if (typeof FTechApp !== 'undefined' && !FTechApp.escapeHtml) {
+  FTechApp.escapeHtml = function(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  };
+}
+
 // Cache for in-memory filtering
 let cachedDocs = [];
 let cachedSubjects = [];

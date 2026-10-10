@@ -44,13 +44,29 @@ const FTechApp = (() => {
     }, 4000);
   }
 
+  // HTML entity escaper
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Generic API caller with token header injection
   async function apiCall(endpoint, options = {}) {
     try {
       const url = `${API_BASE}${endpoint}`;
       const headers = options.headers || {};
       
-      const token = localStorage.getItem('ftech_token') || localStorage.getItem('ftech_admin_token');
+      const adminToken = localStorage.getItem('ftech_admin_token');
+      const userToken = localStorage.getItem('ftech_token');
+      const token = (endpoint.includes('/admin') || window.location.pathname.includes('/admin'))
+        ? (adminToken || userToken)
+        : (userToken || adminToken);
+
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -597,6 +613,7 @@ const FTechApp = (() => {
     API_BASE,
     showToast,
     apiCall,
+    escapeHtml,
     initTheme,
     getCurrentUser,
     setCurrentUser,
