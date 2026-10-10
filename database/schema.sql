@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS subjects (
 CREATE TABLE IF NOT EXISTS documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('notes', 'aktu-paper', 'lab', 'tutorial')),
+    type TEXT NOT NULL CHECK(type IN ('notes', 'aktu-paper', 'lab', 'tutorial', 'syllabus')),
     subject_id INTEGER,
     subject_code TEXT,
     semester INTEGER NOT NULL,
@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS documents (
     uploader_role TEXT DEFAULT 'Admin',
     downloads_count INTEGER DEFAULT 0,
     views_count INTEGER DEFAULT 0,
+    likes_count INTEGER DEFAULT 0,
+    dislikes_count INTEGER DEFAULT 0,
     rating REAL DEFAULT 4.9,
     is_approved INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -67,6 +69,7 @@ CREATE TABLE IF NOT EXISTS community_posts (
     content TEXT NOT NULL,
     tags TEXT,
     upvotes INTEGER DEFAULT 0,
+    downvotes INTEGER DEFAULT 0,
     views INTEGER DEFAULT 0,
     answers_count INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -80,6 +83,7 @@ CREATE TABLE IF NOT EXISTS community_answers (
     author_badge TEXT DEFAULT 'Contributor',
     content TEXT NOT NULL,
     upvotes INTEGER DEFAULT 0,
+    downvotes INTEGER DEFAULT 0,
     is_accepted INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(post_id) REFERENCES community_posts(id) ON DELETE CASCADE
@@ -115,6 +119,7 @@ CREATE TABLE IF NOT EXISTS users (
     branch TEXT DEFAULT 'CSE',
     semester INTEGER DEFAULT 1,
     role TEXT DEFAULT 'Student',
+    is_blocked INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -123,7 +128,42 @@ CREATE TABLE IF NOT EXISTS email_verifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
     otp TEXT NOT NULL,
-    expires_at INTEGER NOT NULL,
+    expires_at DATETIME NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 10. Document Downloads Log Table (Auditing who downloaded what)
+CREATE TABLE IF NOT EXISTS document_downloads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+    user_id INTEGER,
+    user_email TEXT,
+    user_name TEXT,
+    ip_address TEXT,
+    downloaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
+);
+
+-- 11. Document Votes / Feedback Table (Likes & Dislikes per user)
+CREATE TABLE IF NOT EXISTS document_votes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+    voter_identifier TEXT NOT NULL,
+    vote_type INTEGER NOT NULL, -- +1 for like, -1 for dislike
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(document_id, voter_identifier),
+    FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
+);
+
+-- 12. Community Single-Vote Enforcement Table (Posts & Answers)
+CREATE TABLE IF NOT EXISTS community_votes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    target_type TEXT NOT NULL, -- 'post' or 'answer'
+    target_id INTEGER NOT NULL,
+    voter_identifier TEXT NOT NULL,
+    vote_type INTEGER NOT NULL, -- +1 for upvote, -1 for downvote
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(target_type, target_id, voter_identifier)
+);
+
 

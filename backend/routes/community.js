@@ -17,13 +17,19 @@ router.get('/:id', communityController.getPostDetails);
 // POST /api/community (create a new doubt or discussion)
 router.post('/', communityController.createPost);
 
-// POST /api/community/:id/upvote (upvote discussion)
+// POST /api/community/:id/vote (single-vote like/dislike)
+router.post('/:id/vote', communityController.votePost);
+
+// POST /api/community/:id/upvote (legacy upvote discussion)
 router.post('/:id/upvote', communityController.upvotePost);
 
 // POST /api/community/:id/answers (reply to a discussion)
 router.post('/:id/answers', communityController.addAnswer);
 
-// POST /api/community/answers/:id/upvote (upvote an answer)
+// POST /api/community/answers/:id/vote (single-vote like/dislike for answer)
+router.post('/answers/:id/vote', communityController.voteAnswer);
+
+// POST /api/community/answers/:id/upvote (legacy upvote answer)
 router.post('/answers/:id/upvote', communityController.upvoteAnswer);
 
 module.exports = router;

@@ -18,6 +18,9 @@ router.get('/:id', documentController.getDocumentById);
 // GET /api/documents/:id/download (download document file)
 router.get('/:id/download', documentController.downloadDocument);
 
+// POST /api/documents/:id/vote (like or dislike document)
+router.post('/:id/vote', documentController.voteDocument);
+
 // POST /api/documents/upload (upload notes/papers with file)
 router.post('/upload', upload.single('file'), handleUploadErrors, documentController.uploadDocument);
 

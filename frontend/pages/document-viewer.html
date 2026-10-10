@@ -115,6 +115,11 @@
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
               </button>
 
+              <div style="display:flex; align-items:center; gap:0.4rem; padding:0 0.5rem; border-left:1px solid var(--border-glass); border-right:1px solid var(--border-glass);">
+                <button onclick="voteViewerDoc(1)" class="icon-btn" style="width:auto; height:34px; padding:0 0.6rem; font-size:0.8rem; display:flex; gap:0.3rem; align-items:center; color:#10b981;" title="Like">👍 <span id="viewerLikes">0</span></button>
+                <button onclick="voteViewerDoc(-1)" class="icon-btn" style="width:auto; height:34px; padding:0 0.6rem; font-size:0.8rem; display:flex; gap:0.3rem; align-items:center; color:#f43f5e;" title="Dislike">👎 <span id="viewerDislikes">0</span></button>
+              </div>
+
               <button onclick="downloadCurrentDoc()" class="btn btn-primary btn-sm" style="padding:0.35rem 0.85rem;">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Download PDF
@@ -232,8 +237,26 @@
     }
 
     function downloadCurrentDoc() {
-      FTechApp.showToast('Downloading document...', 'info');
-      window.location.href = `${FTechApp.API_BASE}/api/documents/${currentDocId}/download`;
+      const user = FTechApp.getCurrentUser();
+      const emailParam = user ? encodeURIComponent(user.email || '') : '';
+      const nameParam = user ? encodeURIComponent(user.fullName || user.name || '') : '';
+      FTechApp.showToast('Downloading document from F-TECH servers...', 'info');
+      window.location.href = `${FTechApp.API_BASE}/api/documents/${currentDocId}/download?user_email=${emailParam}&user_name=${nameParam}`;
+    }
+
+    async function voteViewerDoc(voteType) {
+      const res = await FTechApp.apiCall(`/api/documents/${currentDocId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_type: voteType })
+      });
+      if (res && res.success) {
+        document.getElementById('viewerLikes').textContent = res.likes_count || 0;
+        document.getElementById('viewerDislikes').textContent = res.dislikes_count || 0;
+        FTechApp.showToast(res.message, 'success');
+      } else {
+        FTechApp.showToast(res?.message || 'Vote failed', 'error');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -264,6 +287,8 @@
         document.getElementById('docViewerTitle').textContent = doc.title;
         document.getElementById('paperSheetTitle').textContent = doc.title.toUpperCase();
         document.getElementById('paperSheetCode').textContent = `Subject: ${doc.subject_code} (Semester ${doc.semester})`;
+        document.getElementById('viewerLikes').textContent = doc.likes_count || 0;
+        document.getElementById('viewerDislikes').textContent = doc.dislikes_count || 0;
       }
     });
   </script>

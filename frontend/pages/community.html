@@ -234,11 +234,14 @@
         return `
           <div class="post-card" id="post-card-${p.id}">
             <div class="post-votes">
-              <button onclick="upvotePost(${p.id}, this)" class="vote-btn" title="Upvote Discussion">
+              <button onclick="voteCommunityPost(${p.id}, 1, this)" class="vote-btn ${p.userVote === 1 ? 'active-upvote' : ''}" id="upvote-btn-${p.id}" title="Upvote (Single Vote)" style="${p.userVote === 1 ? 'color:#10b981; font-weight:bold;' : ''}">
                 ▲
               </button>
-              <span class="vote-count" id="vote-${p.id}">${p.upvotes || 0}</span>
-              <span style="font-size:0.7rem; color:var(--text-dim);">votes</span>
+              <span class="vote-count" id="vote-${p.id}">${(p.upvotes || 0) - (p.downvotes || 0)}</span>
+              <button onclick="voteCommunityPost(${p.id}, -1, this)" class="vote-btn ${p.userVote === -1 ? 'active-downvote' : ''}" id="downvote-btn-${p.id}" title="Downvote (Single Vote)" style="font-size:0.75rem; ${p.userVote === -1 ? 'color:#f43f5e; font-weight:bold;' : ''}">
+                ▼
+              </button>
+              <span style="font-size:0.65rem; color:var(--text-dim);" id="vote-split-${p.id}">+${p.upvotes || 0} / -${p.downvotes || 0}</span>
             </div>
 
             <div class="post-body">
@@ -334,9 +337,14 @@
               </div>
               <div class="reply-text">${escapeHtml(ans.content)}</div>
             </div>
-            <button onclick="upvoteAnswer(${ans.id}, this)" class="reply-upvote-btn" title="Helpful Answer">
-              ▲ <span id="ans-vote-${ans.id}">${ans.upvotes || 0}</span>
-            </button>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+              <button onclick="voteCommunityAnswer(${ans.id}, 1, this)" class="reply-upvote-btn ${ans.userVote === 1 ? 'active' : ''}" id="ans-up-${ans.id}" title="Helpful (+1)" style="${ans.userVote === 1 ? 'color:#10b981; border-color:#10b981;' : ''}">
+                ▲ <span id="ans-up-cnt-${ans.id}">${ans.upvotes || 0}</span>
+              </button>
+              <button onclick="voteCommunityAnswer(${ans.id}, -1, this)" class="reply-upvote-btn ${ans.userVote === -1 ? 'active' : ''}" id="ans-dn-${ans.id}" title="Not Helpful (-1)" style="font-size:0.7rem; padding:0.15rem 0.4rem; ${ans.userVote === -1 ? 'color:#f43f5e; border-color:#f43f5e;' : ''}">
+                ▼ <span id="ans-dn-cnt-${ans.id}">${ans.downvotes || 0}</span>
+              </button>
+            </div>
           </div>
         `).join('');
       } else {
@@ -380,25 +388,103 @@
       }
     }
 
-    async function upvotePost(id, btn) {
-      const res = await FTechApp.apiCall(`/api/community/${id}/upvote`, { method: 'POST' });
+    function getVoterIdentifier() {
+      let vid = localStorage.getItem('ftech_voter_id');
+      if (!vid) {
+        vid = 'voter_' + Math.random().toString(36).substring(2, 12);
+        localStorage.setItem('ftech_voter_id', vid);
+      }
+      return vid;
+    }
+
+    async function voteCommunityPost(id, voteType, btn) {
+      const voter_id = getVoterIdentifier();
+      const res = await FTechApp.apiCall(`/api/community/${id}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_type: voteType, voter_id })
+      });
+
       if (res && res.success) {
-        const el = document.getElementById(`vote-${id}`);
-        if (el) el.textContent = res.upvotes;
-        btn.style.color = 'var(--primary)';
-        FTechApp.showToast('Upvoted discussion!', 'success');
+        const netVoteEl = document.getElementById(`vote-${id}`);
+        const splitEl = document.getElementById(`vote-split-${id}`);
+        const upBtn = document.getElementById(`upvote-btn-${id}`);
+        const dnBtn = document.getElementById(`downvote-btn-${id}`);
+
+        if (netVoteEl) netVoteEl.textContent = (res.upvotes || 0) - (res.downvotes || 0);
+        if (splitEl) splitEl.textContent = `+${res.upvotes || 0} / -${res.downvotes || 0}`;
+
+        if (upBtn) {
+          if (res.currentVote === 1) {
+            upBtn.style.color = '#10b981';
+            upBtn.style.fontWeight = 'bold';
+          } else {
+            upBtn.style.color = '';
+            upBtn.style.fontWeight = '';
+          }
+        }
+        if (dnBtn) {
+          if (res.currentVote === -1) {
+            dnBtn.style.color = '#f43f5e';
+            dnBtn.style.fontWeight = 'bold';
+          } else {
+            dnBtn.style.color = '';
+            dnBtn.style.fontWeight = '';
+          }
+        }
+        FTechApp.showToast(res.message, 'success');
+      } else {
+        FTechApp.showToast(res?.message || 'Vote failed', 'error');
       }
     }
 
-    async function upvoteAnswer(id, btn) {
-      const res = await FTechApp.apiCall(`/api/community/answers/${id}/upvote`, { method: 'POST' });
+    async function voteCommunityAnswer(id, voteType, btn) {
+      const voter_id = getVoterIdentifier();
+      const res = await FTechApp.apiCall(`/api/community/answers/${id}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_type: voteType, voter_id })
+      });
+
       if (res && res.success) {
-        const el = document.getElementById(`ans-vote-${id}`);
-        if (el) el.textContent = res.upvotes;
-        btn.style.color = 'var(--primary)';
-        btn.style.borderColor = 'var(--primary)';
-        FTechApp.showToast('Upvoted answer!', 'success');
+        const upCnt = document.getElementById(`ans-up-cnt-${id}`);
+        const dnCnt = document.getElementById(`ans-dn-cnt-${id}`);
+        const upBtn = document.getElementById(`ans-up-${id}`);
+        const dnBtn = document.getElementById(`ans-dn-${id}`);
+
+        if (upCnt) upCnt.textContent = res.upvotes;
+        if (dnCnt) dnCnt.textContent = res.downvotes;
+
+        if (upBtn) {
+          if (res.currentVote === 1) {
+            upBtn.style.color = '#10b981';
+            upBtn.style.borderColor = '#10b981';
+          } else {
+            upBtn.style.color = '';
+            upBtn.style.borderColor = '';
+          }
+        }
+        if (dnBtn) {
+          if (res.currentVote === -1) {
+            dnBtn.style.color = '#f43f5e';
+            dnBtn.style.borderColor = '#f43f5e';
+          } else {
+            dnBtn.style.color = '';
+            dnBtn.style.borderColor = '';
+          }
+        }
+        FTechApp.showToast(res.message, 'success');
+      } else {
+        FTechApp.showToast(res?.message || 'Vote failed', 'error');
       }
+    }
+
+    async function upvotePost(id, btn) {
+      return voteCommunityPost(id, 1, btn);
+    }
+
+    async function upvoteAnswer(id, btn) {
+      return voteCommunityAnswer(id, 1, btn);
     }
 
     function filterByTag(tag) {

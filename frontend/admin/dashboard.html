@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | F-TECH-Student-Hub</title>
-  <meta name="description" content="Administrative command center for F-TECH-Student-Hub. Overseen by Aditya Kumar Sharma (F-TECH).">
+  <title>Admin Command Center | F-TECH-Student-Hub</title>
+  <meta name="description" content="Complete Administrative Control for F-TECH-Student-Hub. Overseen by Founder Aditya Kumar Sharma.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -29,12 +29,15 @@
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
         <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme">
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
         <button id="openSubModalBtn" class="btn btn-secondary btn-sm">
           + Add Subject
+        </button>
+        <button id="openLabModalBtn" class="btn btn-secondary btn-sm">
+          + Add Lab Exp
         </button>
         <button id="openUploadAdminBtn" class="btn btn-primary btn-sm">
           + Upload Material
@@ -51,66 +54,295 @@
       </div>
     </div>
 
-    <!-- Analytics Cards -->
+    <!-- Analytics KPI Cards -->
     <div class="stats-grid">
       <div class="stat-widget">
         <div class="stat-icon indigo">📚</div>
         <div>
           <div class="stat-number" id="statTotalDocs">0</div>
-          <div class="stat-label">Total Documents Published</div>
-        </div>
-      </div>
-      <div class="stat-widget">
-        <div class="stat-icon amber">📑</div>
-        <div>
-          <div class="stat-number" id="statTotalPapers">0</div>
-          <div class="stat-label">AKTU Question Papers</div>
+          <div class="stat-label">Published Documents</div>
         </div>
       </div>
       <div class="stat-widget">
         <div class="stat-icon emerald">⚡</div>
         <div>
           <div class="stat-number" id="statTotalDownloads">0</div>
-          <div class="stat-label">Downloads Delivered</div>
+          <div class="stat-label">Total Downloads Logged</div>
+        </div>
+      </div>
+      <div class="stat-widget">
+        <div class="stat-icon amber">👍</div>
+        <div>
+          <div class="stat-number" id="statLikesDislikes">0 / 0</div>
+          <div class="stat-label">Total Likes / Dislikes</div>
         </div>
       </div>
       <div class="stat-widget">
         <div class="stat-icon cyan">🎓</div>
         <div>
           <div class="stat-number" id="statTotalSubjects">0</div>
-          <div class="stat-label">Academic Subjects</div>
+          <div class="stat-label">Active Subjects (Sem 1-8)</div>
         </div>
       </div>
     </div>
 
-    <!-- Data Table Container -->
-    <div class="data-table-container">
-      <div class="table-header-bar">
-        <div>
-          <h3 style="font-size: 1.15rem; font-weight: 700;">Repository Document Governance</h3>
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Manage, approve, or delete study materials from database</p>
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs-nav">
+      <button class="admin-tab-btn active" onclick="switchAdminTab('documents')">
+        📄 Documents & Notes <span class="tab-badge" id="badgeDocsCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('subjects')">
+        📖 Subjects & Syllabus <span class="tab-badge" id="badgeSubsCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('labs')">
+        🔬 Lab Assignments <span class="tab-badge" id="badgeLabsCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('community')">
+        💬 Community Forum <span class="tab-badge" id="badgePostsCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('users')">
+        👥 Users & Members <span class="tab-badge" id="badgeUsersCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('downloads')">
+        📊 Download Audit & Tracking
+      </button>
+    </div>
+
+    <!-- TAB 1: Documents Management -->
+    <div id="tab-documents" class="admin-tab-pane active">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Study Materials & Papers Governance</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Full control to block, unblock, or delete notes, AKTU papers, labs, tutorials, and syllabus.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <select id="docFilterType" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;" onchange="filterAdminDocs()">
+              <option value="">All Document Types</option>
+              <option value="notes">Notes</option>
+              <option value="aktu-paper">AKTU Question Papers</option>
+              <option value="lab">Lab Manuals</option>
+              <option value="tutorial">Tutorials</option>
+              <option value="syllabus">Syllabus</option>
+            </select>
+            <select id="docFilterSem" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;" onchange="filterAdminDocs()">
+              <option value="">All Semesters</option>
+              <option value="1">Sem 1</option>
+              <option value="2">Sem 2</option>
+              <option value="3">Sem 3</option>
+              <option value="4">Sem 4</option>
+              <option value="5">Sem 5</option>
+              <option value="6">Sem 6</option>
+              <option value="7">Sem 7</option>
+              <option value="8">Sem 8</option>
+            </select>
+            <input type="text" id="docSearchInput" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem; width: 180px;" placeholder="Search title or code..." oninput="filterAdminDocs()">
+            <button onclick="loadAdminDocumentsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
         </div>
-        <div>
-          <button onclick="loadAdminDocumentsTable()" class="btn btn-secondary btn-sm">Refresh Table</button>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Document Title & File</th>
+                <th>Subject</th>
+                <th>Semester</th>
+                <th>Type</th>
+                <th>Downloads</th>
+                <th>Likes / Dislikes</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminDocTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
         </div>
       </div>
+    </div>
 
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Document Title & File</th>
-              <th>Subject</th>
-              <th>Semester</th>
-              <th>Type</th>
-              <th>Downloads</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="adminDocTableBody">
-            <!-- Loaded via js/admin.js -->
-          </tbody>
-        </table>
+    <!-- TAB 2: Subjects Management -->
+    <div id="tab-subjects" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Academic Subjects & Syllabus Master List</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Add new subjects, examine curriculum, or permanently delete unwanted subjects.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <select id="subFilterSem" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;" onchange="filterAdminSubjects()">
+              <option value="">All Semesters (1-8)</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+            <input type="text" id="subSearchInput" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem; width: 180px;" placeholder="Search subject code/title..." oninput="filterAdminSubjects()">
+            <button onclick="document.getElementById('subjectModal').classList.add('active')" class="btn btn-primary btn-sm">+ Add Subject</button>
+            <button onclick="loadAdminSubjectsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Subject Code</th>
+                <th>Title</th>
+                <th>Branch</th>
+                <th>Semester</th>
+                <th>Credits</th>
+                <th>Linked Materials</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubjectTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Lab Experiments Management -->
+    <div id="tab-labs" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Lab Experiments & Practical Assignments</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage programming labs, objectives, source codes, and viva questions.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button onclick="document.getElementById('labModal').classList.add('active')" class="btn btn-primary btn-sm">+ Add Lab Experiment</button>
+            <button onclick="loadAdminLabsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Subject Code</th>
+                <th>Exp #</th>
+                <th>Title</th>
+                <th>Language</th>
+                <th>Objective & Code Summary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminLabTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Community Moderation -->
+    <div id="tab-community" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Community Forum & Doubt Resolution Moderation</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Remove spam questions or inappropriate discussion content.</p>
+          </div>
+          <div>
+            <button onclick="loadAdminCommunityTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Discussion Question</th>
+                <th>Author</th>
+                <th>Tags</th>
+                <th>Votes (Up/Down)</th>
+                <th>Answers</th>
+                <th>Posted Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminCommunityTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Users & Members Governance -->
+    <div id="tab-users" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Registered Students & Member Accounts</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">View student profiles, block misbehaving users, or remove accounts.</p>
+          </div>
+          <div>
+            <button onclick="loadAdminUsersTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Branch & Semester</th>
+                <th>Role</th>
+                <th>Downloads Logged</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Download Audit & Tracking -->
+    <div id="tab-downloads" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Real-Time Download Tracking & User Audit Trail</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Track exactly who downloaded which document, when, and from what IP address.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="downloadSearchInput" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem; width: 220px;" placeholder="Filter by student or doc..." oninput="filterDownloadLogs()">
+            <button onclick="loadAdminDownloadLogsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Document Name & Subject</th>
+                <th>Downloaded By (User)</th>
+                <th>Email Address</th>
+                <th>IP Address</th>
+                <th>Timestamp</th>
+                <th>Overall Material Stats</th>
+              </tr>
+            </thead>
+            <tbody id="adminDownloadLogsTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -164,21 +396,66 @@
         </div>
         <div class="form-group">
           <label>Curriculum Summary / Description</label>
-          <textarea id="subDescInput" class="form-control" rows="3" placeholder="Brief topics covered in 5 units..."></textarea>
+          <textarea id="subDescInput" class="form-control" rows="3" placeholder="Brief topics covered in syllabus units..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Create Subject in F-TECH</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Subject in F-TECH</button>
       </form>
     </div>
   </div>
 
-  <!-- Upload Modal -->
+  <!-- Add Lab Experiment Modal -->
+  <div class="modal-overlay" id="labModal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>Add Lab Experiment</h3>
+        <span class="modal-close" onclick="document.getElementById('labModal').classList.remove('active')">&times;</span>
+      </div>
+      <form id="createLabForm" class="modal-body" onsubmit="handleCreateLab(event)">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="labSubCodeInput" class="form-control" placeholder="e.g. KCS-351" required>
+          </div>
+          <div class="form-group">
+            <label>Exp Number *</label>
+            <input type="number" id="labExpNoInput" class="form-control" value="1" min="1" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Experiment Title *</label>
+            <input type="text" id="labTitleInput" class="form-control" placeholder="e.g. Infix to Postfix Conversion" required>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input type="text" id="labLangInput" class="form-control" placeholder="e.g. C / C++ / Python" value="C/C++">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Objective *</label>
+          <textarea id="labObjectiveInput" class="form-control" rows="2" placeholder="State the problem objective..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Source Code *</label>
+          <textarea id="labCodeInput" class="form-control" rows="5" placeholder="#include <stdio.h> ... Write complete runnable code" required style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Sample Output</label>
+          <textarea id="labOutputInput" class="form-control" rows="2" placeholder="Expected terminal output..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Lab Experiment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Direct Material Upload Modal -->
   <div class="modal-overlay" id="uploadModal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Publish New Material (Admin Direct)</h3>
+        <h3>Publish Study Material (Direct Admin)</h3>
         <span class="modal-close" onclick="document.getElementById('uploadModal').classList.remove('active')">&times;</span>
       </div>
-      <form id="studentUploadForm" class="modal-body">
+      <form id="adminUploadForm" class="modal-body" onsubmit="handleAdminUpload(event)">
         <div class="form-group">
           <label>Title *</label>
           <input type="text" id="uploadTitle" class="form-control" placeholder="e.g. AKTU 2024 End Sem Paper" required>
@@ -187,10 +464,11 @@
           <div class="form-group">
             <label>Type *</label>
             <select id="uploadType" class="form-control">
-              <option value="aktu-paper">AKTU Question Paper</option>
               <option value="notes">Handwritten Notes</option>
+              <option value="aktu-paper">AKTU Question Paper</option>
               <option value="lab">Lab Manual</option>
               <option value="tutorial">Tutorial</option>
+              <option value="syllabus">Syllabus</option>
             </select>
           </div>
           <div class="form-group">
@@ -208,6 +486,8 @@
               <option value="4">Semester 4</option>
               <option value="5">Semester 5</option>
               <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
             </select>
           </div>
           <div class="form-group">
@@ -221,22 +501,24 @@
             </select>
           </div>
         </div>
-        <input type="hidden" id="uploadAuthor" value="Aditya Kumar Sharma (F-TECH)">
         <div class="form-group">
-          <label>File (Optional)</label>
+          <label>Unit (1-5)</label>
+          <input type="number" id="uploadUnit" class="form-control" min="1" max="5" value="1">
+        </div>
+        <div class="form-group">
+          <label>File (PDF/Word/ZIP)</label>
           <div id="fileDropZone" style="border: 2px dashed var(--border-glass); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; cursor: pointer;">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Select file or drag and drop</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Click to choose file or drag and drop</p>
             <input type="file" id="uploadFileInput" style="display:none;" accept=".pdf,.doc,.docx,.zip">
-            <div id="selectedFileName" style="margin-top: 0.4rem; font-size: 0.82rem; font-weight: 600;"></div>
+            <div id="selectedFileName" style="margin-top: 0.4rem; font-size: 0.82rem; font-weight: 600; color: #38bdf8;"></div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary">Publish to F-TECH Hub</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Publish to F-TECH Hub</button>
       </form>
     </div>
   </div>
 
   <script src="../js/app.js"></script>
-  <script src="../js/uploads.js"></script>
   <script src="../js/admin.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -246,8 +528,24 @@
         document.getElementById('subjectModal').classList.add('active');
       });
 
+      document.getElementById('openLabModalBtn').addEventListener('click', () => {
+        document.getElementById('labModal').classList.add('active');
+      });
+
       document.getElementById('openUploadAdminBtn').addEventListener('click', () => {
         document.getElementById('uploadModal').classList.add('active');
+      });
+
+      // File chooser
+      const dropZone = document.getElementById('fileDropZone');
+      const fileInput = document.getElementById('uploadFileInput');
+      const fileNameEl = document.getElementById('selectedFileName');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+          fileNameEl.textContent = `Selected: ${fileInput.files[0].name} (${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
+        }
       });
     });
   </script>

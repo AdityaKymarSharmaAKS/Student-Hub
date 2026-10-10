@@ -27,6 +27,41 @@ if (fs.existsSync(schemaFile)) {
   db.exec(schemaSQL);
 }
 
+// Safe migrations for newly added columns
+function runMigrations() {
+  try {
+    // 1. documents table
+    const docCols = db.prepare("PRAGMA table_info(documents)").all().map(c => c.name);
+    if (!docCols.includes('likes_count')) {
+      db.exec("ALTER TABLE documents ADD COLUMN likes_count INTEGER DEFAULT 0");
+    }
+    if (!docCols.includes('dislikes_count')) {
+      db.exec("ALTER TABLE documents ADD COLUMN dislikes_count INTEGER DEFAULT 0");
+    }
+
+    // 2. users table
+    const userCols = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
+    if (!userCols.includes('is_blocked')) {
+      db.exec("ALTER TABLE users ADD COLUMN is_blocked INTEGER DEFAULT 0");
+    }
+
+    // 3. community_posts table
+    const postCols = db.prepare("PRAGMA table_info(community_posts)").all().map(c => c.name);
+    if (!postCols.includes('downvotes')) {
+      db.exec("ALTER TABLE community_posts ADD COLUMN downvotes INTEGER DEFAULT 0");
+    }
+
+    // 4. community_answers table
+    const ansCols = db.prepare("PRAGMA table_info(community_answers)").all().map(c => c.name);
+    if (!ansCols.includes('downvotes')) {
+      db.exec("ALTER TABLE community_answers ADD COLUMN downvotes INTEGER DEFAULT 0");
+    }
+  } catch (err) {
+    console.warn('[F-TECH-Student-Hub] Migration notice:', err.message);
+  }
+}
+runMigrations();
+
 // Seed Initial Data if empty
 function seedDatabase() {
   const countRow = db.prepare('SELECT COUNT(*) as count FROM subjects').get();
