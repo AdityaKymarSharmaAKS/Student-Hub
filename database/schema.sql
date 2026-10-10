@@ -166,4 +166,18 @@ CREATE TABLE IF NOT EXISTS community_votes (
     UNIQUE(target_type, target_id, voter_identifier)
 );
 
+-- 13. Tutorials Table (Playlists & Concept Guides)
+CREATE TABLE IF NOT EXISTS tutorials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    subject_code TEXT NOT NULL,
+    subject_title TEXT,
+    semester INTEGER DEFAULT 1,
+    video_count INTEGER DEFAULT 10,
+    instructor TEXT DEFAULT 'Aditya Kumar Sharma (F-TECH)',
+    video_url TEXT NOT NULL,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 

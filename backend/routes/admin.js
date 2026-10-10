@@ -43,4 +43,10 @@ router.delete('/users/:id', authenticateAdmin, adminController.deleteUser);
 // 6. Download Tracking & Audit Trail
 router.get('/downloads/logs', authenticateAdmin, adminController.getDownloadLogs);
 
+// 7. Video Tutorials & Playlists
+router.get('/tutorials', authenticateAdmin, adminController.getAllTutorialsAdmin);
+router.post('/tutorials', authenticateAdmin, adminController.createTutorial);
+router.put('/tutorials/:id', authenticateAdmin, adminController.updateTutorial);
+router.delete('/tutorials/:id', authenticateAdmin, adminController.deleteTutorial);
+
 module.exports = router;

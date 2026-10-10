@@ -22,6 +22,7 @@ if (typeof FTechApp !== 'undefined' && !FTechApp.escapeHtml) {
 // Cache for in-memory filtering
 let cachedDocs = [];
 let cachedSubjects = [];
+let cachedTutorials = [];
 let cachedLabs = [];
 let cachedCommunity = [];
 let cachedUsers = [];
@@ -108,6 +109,7 @@ function switchAdminTab(tabKey) {
 
   if (tabKey === 'documents') loadAdminDocumentsTable();
   if (tabKey === 'subjects') loadAdminSubjectsTable();
+  if (tabKey === 'tutorials') loadAdminTutorialsTable();
   if (tabKey === 'labs') loadAdminLabsTable();
   if (tabKey === 'community') loadAdminCommunityTable();
   if (tabKey === 'users') loadAdminUsersTable();
@@ -134,6 +136,7 @@ async function loadAdminDashboard() {
 
     if (document.getElementById('badgeDocsCount')) document.getElementById('badgeDocsCount').textContent = s.documentsCount ?? 0;
     if (document.getElementById('badgeSubsCount')) document.getElementById('badgeSubsCount').textContent = s.subjectsCount ?? 0;
+    if (document.getElementById('badgeTutorialsCount')) document.getElementById('badgeTutorialsCount').textContent = s.tutorialsCount ?? 0;
     if (document.getElementById('badgeLabsCount')) document.getElementById('badgeLabsCount').textContent = s.labsCount ?? 0;
     if (document.getElementById('badgePostsCount')) document.getElementById('badgePostsCount').textContent = s.postsCount ?? 0;
     if (document.getElementById('badgeUsersCount')) document.getElementById('badgeUsersCount').textContent = s.usersCount ?? 0;
@@ -373,6 +376,155 @@ async function handleCreateSubject(e) {
     loadAdminSubjectsTable();
   } else {
     FTechApp.showToast(res.message || 'Creation failed', 'error');
+  }
+}
+
+// --------------------------------------------------------------------------
+// 2B. VIDEO TUTORIALS & PLAYLISTS
+// --------------------------------------------------------------------------
+async function loadAdminTutorialsTable() {
+  const tableBody = document.getElementById('adminTutorialTableBody');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem;">Loading video tutorials...</td></tr>`;
+
+  const res = await FTechApp.apiCall('/api/admin/tutorials');
+  if (res.success && res.data) {
+    cachedTutorials = res.data;
+    if (document.getElementById('badgeTutorialsCount')) {
+      document.getElementById('badgeTutorialsCount').textContent = cachedTutorials.length;
+    }
+    renderAdminTutorialsTable(cachedTutorials);
+  } else {
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color:var(--accent-rose);">${res.message || 'Failed to load tutorials'}</td></tr>`;
+  }
+}
+
+function renderAdminTutorialsTable(tutorials) {
+  const tableBody = document.getElementById('adminTutorialTableBody');
+  if (!tableBody) return;
+
+  if (tutorials.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color:var(--text-muted);">No video tutorials found. Click "+ Add Tutorial" to create one.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = tutorials.map(tut => `
+    <tr>
+      <td>
+        <strong>${FTechApp.escapeHtml(tut.title)}</strong>
+        <div style="font-size:0.75rem; color:var(--text-dim); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${FTechApp.escapeHtml(tut.description || '')}
+        </div>
+      </td>
+      <td>
+        <span class="card-code">${FTechApp.escapeHtml(tut.subject_code)}</span>
+        <div style="font-size:0.75rem; color:var(--text-muted);">${FTechApp.escapeHtml(tut.subject_title || '')}</div>
+      </td>
+      <td>Sem ${tut.semester}</td>
+      <td><span class="badge-tag badge-sem">${tut.video_count || 1} Videos</span></td>
+      <td><span style="font-size:0.85rem; color:var(--text-muted);">${FTechApp.escapeHtml(tut.instructor || 'F-TECH')}</span></td>
+      <td>
+        <a href="${FTechApp.escapeHtml(tut.video_url)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.6rem;">
+          ▶ View Link
+        </a>
+      </td>
+      <td>
+        <div class="action-buttons">
+          <button onclick="openEditTutorialModal(${tut.id})" class="btn-icon-warning" title="Edit Tutorial">
+            ✏️ Edit
+          </button>
+          <button onclick="deleteTutorialAdmin(${tut.id}, '${FTechApp.escapeHtml(tut.title).replace(/'/g, "\\'")}')" class="btn-icon-danger" title="Delete Tutorial">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openCreateTutorialModal() {
+  document.getElementById('tutorialForm').reset();
+  document.getElementById('tutEditId').value = '';
+  document.getElementById('tutorialModalTitle').textContent = 'Add Video Tutorial';
+  document.getElementById('saveTutorialBtn').textContent = 'Create Tutorial in F-TECH';
+  document.getElementById('tutorialModal')?.classList.add('active');
+}
+
+function openEditTutorialModal(id) {
+  const tut = cachedTutorials.find(t => t.id === id);
+  if (!tut) return;
+
+  document.getElementById('tutEditId').value = tut.id;
+  document.getElementById('tutTitleInput').value = tut.title || '';
+  document.getElementById('tutSubCodeInput').value = tut.subject_code || '';
+  document.getElementById('tutSubTitleInput').value = tut.subject_title || '';
+  document.getElementById('tutSemesterInput').value = tut.semester || 1;
+  document.getElementById('tutVideoCountInput').value = tut.video_count || 10;
+  document.getElementById('tutInstructorInput').value = tut.instructor || '';
+  document.getElementById('tutUrlInput').value = tut.video_url || '';
+  document.getElementById('tutDescInput').value = tut.description || '';
+
+  document.getElementById('tutorialModalTitle').textContent = 'Edit Video Tutorial';
+  document.getElementById('saveTutorialBtn').textContent = 'Update Tutorial';
+  document.getElementById('tutorialModal')?.classList.add('active');
+}
+
+function closeTutorialModal() {
+  document.getElementById('tutorialModal')?.classList.remove('active');
+}
+
+async function handleSaveTutorial(e) {
+  e.preventDefault();
+  const editId = document.getElementById('tutEditId').value;
+  const title = document.getElementById('tutTitleInput').value.trim();
+  const subject_code = document.getElementById('tutSubCodeInput').value.trim();
+  const subject_title = document.getElementById('tutSubTitleInput').value.trim();
+  const semester = document.getElementById('tutSemesterInput').value;
+  const video_count = document.getElementById('tutVideoCountInput').value;
+  const instructor = document.getElementById('tutInstructorInput').value.trim();
+  const video_url = document.getElementById('tutUrlInput').value.trim();
+  const description = document.getElementById('tutDescInput').value.trim();
+
+  const payload = { title, subject_code, subject_title, semester, video_count, instructor, video_url, description };
+
+  let res;
+  if (editId) {
+    res = await FTechApp.apiCall(`/api/admin/tutorials/${editId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } else {
+    res = await FTechApp.apiCall('/api/admin/tutorials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  }
+
+  if (res.success) {
+    FTechApp.showToast(res.message || 'Tutorial saved successfully!', 'success');
+    closeTutorialModal();
+    loadAdminDashboard();
+    loadAdminTutorialsTable();
+  } else {
+    FTechApp.showToast(res.message || 'Operation failed', 'error');
+  }
+}
+
+async function deleteTutorialAdmin(id, title) {
+  if (!confirm(`Are you sure you want to delete tutorial "${title}"?`)) return;
+
+  const res = await FTechApp.apiCall(`/api/admin/tutorials/${id}`, { method: 'DELETE' });
+  if (res.success) {
+    FTechApp.showToast(res.message, 'success');
+    loadAdminDashboard();
+    loadAdminTutorialsTable();
+  } else {
+    FTechApp.showToast(res.message || 'Failed to delete tutorial', 'error');
   }
 }
 

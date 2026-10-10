@@ -40,6 +40,7 @@ app.use('/api/documents', require('./routes/documents'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/donations', require('./routes/donations'));
+app.use('/api/tutorials', require('./routes/tutorials'));
 
 // Public Stats Endpoint
 app.get('/api/stats', (req, res) => {
@@ -51,6 +52,7 @@ app.get('/api/stats', (req, res) => {
     const totalViews = db.prepare('SELECT SUM(views_count) as total FROM documents').get().total || 0;
     const papersCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'aktu-paper' AND is_approved = 1").get().count || 0;
     const notesCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'notes' AND is_approved = 1").get().count || 0;
+    const tutorialsCount = db.prepare('SELECT COUNT(*) as count FROM tutorials').get().count || 0;
 
     res.json({
       success: true,
@@ -61,6 +63,7 @@ app.get('/api/stats', (req, res) => {
         totalViews,
         papersCount,
         notesCount,
+        tutorialsCount,
         company: 'F-TECH',
         founder: 'Aditya Kumar Sharma'
       }

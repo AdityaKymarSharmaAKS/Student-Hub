@@ -38,6 +38,7 @@ exports.getStats = (req, res) => {
     const papersCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'aktu-paper'").get().count;
     const notesCount = db.prepare("SELECT COUNT(*) as count FROM documents WHERE type = 'notes'").get().count;
     const labsCount = db.prepare('SELECT COUNT(*) as count FROM lab_experiments').get().count;
+    const tutorialsCount = db.prepare('SELECT COUNT(*) as count FROM tutorials').get().count;
     const usersCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
     const blockedDocsCount = db.prepare('SELECT COUNT(*) as count FROM documents WHERE is_approved = 0').get().count;
 
@@ -63,6 +64,7 @@ exports.getStats = (req, res) => {
         papersCount,
         notesCount,
         labsCount,
+        tutorialsCount,
         usersCount,
         blockedDocsCount,
         company: 'F-TECH',
@@ -380,6 +382,95 @@ exports.getDownloadLogs = (req, res) => {
     `).all(parseInt(limit, 10));
 
     res.json({ success: true, count: logs.length, data: logs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// -------------------------------------------------------------
+// 7. TUTORIALS & VIDEO GUIDES MANAGEMENT
+// -------------------------------------------------------------
+exports.getAllTutorialsAdmin = (req, res) => {
+  try {
+    const tutorials = db.prepare('SELECT * FROM tutorials ORDER BY semester ASC, subject_code ASC, id DESC').all();
+    res.json({ success: true, count: tutorials.length, data: tutorials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.createTutorial = (req, res) => {
+  try {
+    const { title, subject_code, subject_title, semester, video_count, instructor, video_url, description } = req.body;
+    if (!title || !subject_code || !video_url) {
+      return res.status(400).json({ success: false, message: 'Tutorial title, subject code, and video/playlist URL are required.' });
+    }
+
+    const insert = db.prepare(`
+      INSERT INTO tutorials (title, subject_code, subject_title, semester, video_count, instructor, video_url, description)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    insert.run(
+      title.trim(),
+      subject_code.toUpperCase().trim(),
+      (subject_title || '').trim(),
+      parseInt(semester, 10) || 1,
+      parseInt(video_count, 10) || 1,
+      (instructor || 'Aditya Kumar Sharma (F-TECH)').trim(),
+      video_url.trim(),
+      (description || '').trim()
+    );
+
+    res.status(201).json({ success: true, message: `Tutorial "${title}" added successfully!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateTutorial = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, subject_code, subject_title, semester, video_count, instructor, video_url, description } = req.body;
+    const existing = db.prepare('SELECT id FROM tutorials WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Tutorial not found' });
+    }
+
+    const update = db.prepare(`
+      UPDATE tutorials
+      SET title = ?, subject_code = ?, subject_title = ?, semester = ?, video_count = ?, instructor = ?, video_url = ?, description = ?
+      WHERE id = ?
+    `);
+
+    update.run(
+      title.trim(),
+      subject_code.toUpperCase().trim(),
+      (subject_title || '').trim(),
+      parseInt(semester, 10) || 1,
+      parseInt(video_count, 10) || 1,
+      (instructor || 'Aditya Kumar Sharma (F-TECH)').trim(),
+      video_url.trim(),
+      (description || '').trim(),
+      id
+    );
+
+    res.json({ success: true, message: `Tutorial "${title}" updated successfully!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteTutorial = (req, res) => {
+  try {
+    const { id } = req.params;
+    const tut = db.prepare('SELECT id, title FROM tutorials WHERE id = ?').get(id);
+    if (!tut) {
+      return res.status(404).json({ success: false, message: 'Tutorial not found' });
+    }
+
+    db.prepare('DELETE FROM tutorials WHERE id = ?').run(id);
+    res.json({ success: true, message: `Tutorial "${tut.title}" deleted successfully.` });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

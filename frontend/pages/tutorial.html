@@ -111,7 +111,7 @@
           </div>
         </div>
 
-        <div class="cards-grid">
+        <div id="tutorialsGrid" class="cards-grid">
           <!-- Tutorial 1 -->
           <div class="card-item">
             <div class="card-header">
@@ -194,5 +194,44 @@
 
   <script src="../js/app.js"></script>
   <script src="../js/navigation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await FTechApp.apiCall('/api/tutorials');
+        if (res && res.success && res.data && res.data.length > 0) {
+          const grid = document.getElementById('tutorialsGrid');
+          if (!grid) return;
+          const colors = [
+            { icon: 'var(--accent-purple)', bg: 'rgba(168, 85, 247, 0.15)' },
+            { icon: 'var(--secondary)', bg: 'rgba(6, 182, 212, 0.15)' },
+            { icon: 'var(--accent-emerald)', bg: 'rgba(16, 185, 129, 0.15)' },
+            { icon: 'var(--accent-amber)', bg: 'rgba(245, 158, 11, 0.15)' }
+          ];
+          grid.innerHTML = res.data.map((tut, i) => {
+            const c = colors[i % colors.length];
+            return `
+              <div class="card-item">
+                <div class="card-header">
+                  <div class="card-icon" style="color: ${c.icon}; background: ${c.bg};">
+                    ▶
+                  </div>
+                  <span class="badge-tag badge-sem">${FTechApp.escapeHtml(tut.subject_code)} • ${tut.video_count || 1} Videos</span>
+                </div>
+                <div class="card-code">${FTechApp.escapeHtml(tut.subject_title || tut.subject_code)}</div>
+                <h3 class="card-title">${FTechApp.escapeHtml(tut.title)}</h3>
+                <p class="card-desc">${FTechApp.escapeHtml(tut.description || '')}</p>
+                <div class="card-footer">
+                  <span style="font-size:0.8rem; color:var(--text-dim);">${FTechApp.escapeHtml(tut.instructor || 'F-TECH')}</span>
+                  <a href="${FTechApp.escapeHtml(tut.video_url)}" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic tutorials:', err);
+      }
+    });
+  </script>
 </body>
 </html>

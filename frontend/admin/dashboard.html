@@ -94,6 +94,9 @@
       <button class="admin-tab-btn" onclick="switchAdminTab('subjects')">
         📖 Subjects & Syllabus <span class="tab-badge" id="badgeSubsCount">0</span>
       </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tutorials')">
+        ▶ Video Tutorials <span class="tab-badge" id="badgeTutorialsCount">0</span>
+      </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('labs')">
         🔬 Lab Assignments <span class="tab-badge" id="badgeLabsCount">0</span>
       </button>
@@ -203,6 +206,41 @@
               </tr>
             </thead>
             <tbody id="adminSubjectTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Video Tutorials & Masterclasses Management -->
+    <div id="tab-tutorials" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Curated Video Tutorials & Playlists</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Full governance to add, edit, or delete video playlists and concept guides across all semesters.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button onclick="openCreateTutorialModal()" class="btn btn-primary btn-sm">+ Add Tutorial</button>
+            <button onclick="loadAdminTutorialsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Tutorial Title</th>
+                <th>Subject</th>
+                <th>Semester</th>
+                <th>Videos</th>
+                <th>Instructor / Channel</th>
+                <th>Video Link</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminTutorialTableBody">
               <!-- Rendered via js/admin.js -->
             </tbody>
           </table>
@@ -399,6 +437,65 @@
           <textarea id="subDescInput" class="form-control" rows="3" placeholder="Brief topics covered in syllabus units..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Create Subject in F-TECH</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Edit Video Tutorial Modal -->
+  <div class="modal-overlay" id="tutorialModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="tutorialModalTitle">Add Video Tutorial</h3>
+        <span class="modal-close" onclick="closeTutorialModal()">&times;</span>
+      </div>
+      <form id="tutorialForm" class="modal-body" onsubmit="handleSaveTutorial(event)">
+        <input type="hidden" id="tutEditId" value="">
+        <div class="form-group">
+          <label>Tutorial / Playlist Title *</label>
+          <input type="text" id="tutTitleInput" class="form-control" placeholder="e.g. Complete DSA Zero to Hero Masterclass" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="tutSubCodeInput" class="form-control" placeholder="e.g. KCS-301" required>
+          </div>
+          <div class="form-group">
+            <label>Subject Name</label>
+            <input type="text" id="tutSubTitleInput" class="form-control" placeholder="e.g. Data Structures & Algorithms">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Semester</label>
+            <select id="tutSemesterInput" class="form-control">
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3" selected>Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Videos Count</label>
+            <input type="number" id="tutVideoCountInput" class="form-control" value="10" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Instructor / Channel *</label>
+          <input type="text" id="tutInstructorInput" class="form-control" placeholder="e.g. By F-TECH Engineering Wing" value="By F-TECH Engineering Wing" required>
+        </div>
+        <div class="form-group">
+          <label>YouTube / Playlist URL *</label>
+          <input type="url" id="tutUrlInput" class="form-control" placeholder="https://www.youtube.com/..." required>
+        </div>
+        <div class="form-group">
+          <label>Description / Topics Covered</label>
+          <textarea id="tutDescInput" class="form-control" rows="3" placeholder="Key topics covered in this video playlist..."></textarea>
+        </div>
+        <button type="submit" id="saveTutorialBtn" class="btn btn-primary" style="width: 100%;">Save Tutorial</button>
       </form>
     </div>
   </div>
