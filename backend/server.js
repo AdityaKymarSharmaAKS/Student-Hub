@@ -39,6 +39,7 @@ app.use('/api/subjects', require('./routes/subjects'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/donations', require('./routes/donations'));
 
 // Public Stats Endpoint
 app.get('/api/stats', (req, res) => {

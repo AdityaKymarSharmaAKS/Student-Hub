@@ -60,6 +60,10 @@
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             <span>Support & Donate</span>
           </a>
+          <a href="settings.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Settings</span>
+          </a>
         </nav>
       </div>
 
@@ -111,57 +115,96 @@
           </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
           <!-- UPI QR Code Section -->
           <div class="card-item" style="text-align: center; align-items: center; justify-content: center;">
             <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Scan & Pay via UPI</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-              Pay via Google Pay, PhonePe, Paytm, Slice, or any UPI App
+              Scan using Google Pay, PhonePe, Paytm, Slice, or any UPI App
             </p>
 
             <div style="background: #ffffff; padding: 1rem; border-radius: var(--radius-md); display: inline-block; box-shadow: 0 12px 36px rgba(0,0,0,0.45); margin-bottom: 1rem;">
               <img src="../assets/images/slice-upi-qr.jpg" alt="Aditya Kumar Sharma UPI QR" style="width: 230px; height: auto; max-width: 100%; border-radius: var(--radius-sm); display: block;">
             </div>
 
-            <div style="background: rgba(255,255,255,0.05); padding: 0.6rem 1.25rem; border-radius: var(--radius-full); font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; border: 1px solid var(--border-glass);">
-              UPI ID: adityakumarsharma@slc
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+              <div style="background: rgba(255,255,255,0.05); padding: 0.6rem 1.25rem; border-radius: var(--radius-full); font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; border: 1px solid var(--border-glass);">
+                UPI ID: <span id="mainUpiId">adityakumarsharma@slc</span>
+              </div>
+              <button onclick="copyUpiId()" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.85rem;">
+                📋 Copy UPI ID
+              </button>
             </div>
           </div>
 
           <!-- Supporter Tiers -->
           <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="card-item">
+            <!-- Tier 1: Chai Supporter -->
+            <div class="card-item" style="border-color: rgba(245, 158, 11, 0.3);">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="font-size:1.1rem; font-weight:700;">☕ Chai Supporter</h4>
-                <span style="font-size:1.25rem; font-weight:800; color:var(--accent-amber);">₹49</span>
+                <h4 style="font-size:1.15rem; font-weight:700;">☕ Chai Supporter</h4>
+                <span style="font-size:1.35rem; font-weight:800; color:var(--accent-amber);">₹49</span>
               </div>
               <p style="font-size:0.85rem; color:var(--text-muted); margin: 0.5rem 0 1rem;">
-                Helps maintain database storage for 100+ AKTU paper downloads.
+                Helps maintain database storage for 100+ AKTU paper downloads & server upkeep.
               </p>
-              <button onclick="simulateSupport(49, 'Chai Supporter')" class="btn btn-secondary btn-sm">Support ₹49</button>
+              <button onclick="openSupportModal(49, 'Chai Supporter', '☕')" class="btn btn-secondary btn-sm" style="border-color:var(--accent-amber); color:var(--accent-amber);">
+                Support ₹49 (Chai)
+              </button>
             </div>
 
-            <div class="card-item" style="border-color: rgba(99, 102, 241, 0.4);">
+            <!-- Tier 2: Academic Hero -->
+            <div class="card-item" style="border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.03);">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="font-size:1.1rem; font-weight:700;">⭐ F-TECH Academic Hero</h4>
-                <span style="font-size:1.25rem; font-weight:800; color:#818cf8;">₹199</span>
+                <h4 style="font-size:1.15rem; font-weight:700;">⭐ F-TECH Academic Hero</h4>
+                <span style="font-size:1.35rem; font-weight:800; color:#818cf8;">₹199</span>
               </div>
               <p style="font-size:0.85rem; color:var(--text-muted); margin: 0.5rem 0 1rem;">
-                Sponsors high-res scans of handwritten notes and gets a Verified Patron Badge.
+                Sponsors high-resolution scans of handwritten topper notes and unlocks a Verified Patron badge.
               </p>
-              <button onclick="simulateSupport(199, 'Academic Hero')" class="btn btn-primary btn-sm">Support ₹199</button>
+              <button onclick="openSupportModal(199, 'Academic Hero', '⭐')" class="btn btn-primary btn-sm">
+                Support ₹199 (Academic Hero)
+              </button>
             </div>
 
-            <div class="card-item" style="border-color: rgba(16, 185, 129, 0.4);">
+            <!-- Tier 3: Patron of Education -->
+            <div class="card-item" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.03);">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="font-size:1.1rem; font-weight:700;">👑 Patron of Education</h4>
-                <span style="font-size:1.25rem; font-weight:800; color:var(--accent-emerald);">₹499</span>
+                <h4 style="font-size:1.15rem; font-weight:700;">👑 Patron of Education</h4>
+                <span style="font-size:1.35rem; font-weight:800; color:var(--accent-emerald);">₹499</span>
               </div>
               <p style="font-size:0.85rem; color:var(--text-muted); margin: 0.5rem 0 1rem;">
-                Special recognition in the F-TECH Hall of Supporters and permanent community badge.
+                Permanent featured recognition in the F-TECH Hall of Supporters and honorary platform supporter tier.
               </p>
-              <button onclick="simulateSupport(499, 'Patron')" class="btn btn-secondary btn-sm" style="border-color:var(--accent-emerald);">Support ₹499</button>
+              <button onclick="openSupportModal(499, 'Patron of Education', '👑')" class="btn btn-secondary btn-sm" style="border-color:var(--accent-emerald); color:var(--accent-emerald);">
+                Support ₹499 (Patron)
+              </button>
             </div>
+
+            <!-- Custom Amount Option -->
+            <div style="text-align:center; padding:0.5rem 0;">
+              <button onclick="openSupportModal(100, 'Scholar Supporter', '🎓')" class="btn btn-ghost btn-sm" style="color:var(--text-muted); font-size:0.85rem;">
+                Or contribute a custom amount &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live F-TECH Hall of Supporters Section -->
+        <div style="margin-top: 1rem;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--accent-amber);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                F-TECH Hall of Supporters
+              </h2>
+              <p class="section-subtitle">Heartfelt gratitude to our students and scholars who keep F-TECH free for everyone</p>
+            </div>
+            <div id="totalSupportersCount" style="font-size:0.9rem; color:var(--text-muted); font-weight:600;"></div>
+          </div>
+
+          <div id="supportersGrid" class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+            <!-- Loaded dynamically from /api/donations -->
           </div>
         </div>
       </main>
@@ -169,20 +212,265 @@
       <footer class="app-footer">
         <div class="footer-bottom">
           <div class="founder-credit">
-            © 2026 <strong>F-TECH</strong> • <strong>Aditya Kumar Sharma</strong>. Every rupee spent is dedicated to student education.
+            © 2026 <strong>F-TECH</strong> • <strong>Aditya Kumar Sharma</strong>. Every contribution directly powers academic tools for AKTU students.
           </div>
         </div>
       </footer>
     </div>
   </div>
 
+  <!-- Interactive Support & Donation Modal -->
+  <div class="modal-overlay" id="supportModal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="modalTierTitle">☕ Chai Supporter</h3>
+        <span class="modal-close" onclick="closeSupportModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <!-- Amount Selection Bar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.25rem;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Contribution Amount</div>
+            <div style="display:flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:1.5rem; font-weight:800; color:var(--primary);">₹</span>
+              <input type="number" id="supportAmountInput" value="49" min="10" style="background:transparent; border:none; font-size:1.5rem; font-weight:800; color:var(--text-main); width:120px; outline:none;" oninput="updateModalQrCode()">
+            </div>
+          </div>
+          <div id="modalTierBadge" class="badge-tag badge-sem" style="font-size:0.8rem; padding:0.3rem 0.6rem;">
+            Chai Supporter
+          </div>
+        </div>
+
+        <!-- Direct UPI Pay Button -->
+        <a id="directUpiPayLink" href="upi://pay?pa=adityakumarsharma@slc&pn=Aditya%20Kumar%20Sharma&am=49&cu=INR&tn=F-TECH%20Chai%20Supporter" class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-bottom:1rem; padding:0.75rem;">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          Pay via Any UPI App (GPay / PhonePe / Paytm)
+        </a>
+
+        <!-- Dynamic QR Code Container -->
+        <div style="text-align:center; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:1rem; margin-bottom:1.25rem;">
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">Or scan this QR code with any UPI scanner:</p>
+          <div style="background:#ffffff; padding:0.75rem; border-radius:var(--radius-sm); display:inline-block; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <img id="dynamicUpiQr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dadityakumarsharma%40slc%26pn%3DAditya%20Kumar%20Sharma%26am%3D49%26cu%3DINR%26tn%3DF-TECH%20Chai%20Supporter" alt="Dynamic UPI QR" style="width:180px; height:180px; display:block;">
+          </div>
+          <div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-top:0.75rem;">
+            <code style="font-size:0.8rem; color:#38bdf8; background:rgba(255,255,255,0.05); padding:0.25rem 0.6rem; border-radius:4px;">adityakumarsharma@slc</code>
+            <button onclick="copyUpiId()" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;">Copy</button>
+          </div>
+        </div>
+
+        <!-- Confirm Contribution Form -->
+        <form id="confirmSupportForm">
+          <div style="font-size:0.85rem; font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">
+            Claim Your Supporter Recognition:
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label style="font-size:0.8rem;">Your Name *</label>
+            <input type="text" id="supporterName" class="form-control" placeholder="e.g. Alok Sharma" required style="font-size:0.85rem;">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label style="font-size:0.8rem;">Message of Encouragement (Optional)</label>
+            <input type="text" id="supporterMessage" class="form-control" placeholder="e.g. Thanks for the notes, keep rocking F-TECH!" style="font-size:0.85rem;">
+          </div>
+          <button type="submit" id="confirmSupportBtn" class="btn btn-secondary" style="width:100%; border-color:var(--primary); color:var(--primary);">
+            ✨ Confirm Contribution & Claim Badge
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/app.js"></script>
   <script src="../js/navigation.js"></script>
   <script>
-    function simulateSupport(amount, tier) {
-      const name = prompt('Thank you for supporting F-TECH! Please enter your name for recognition:') || 'Anonymous Scholar';
-      FTechApp.showToast(`Thank you ${name}! You are now a recognized F-TECH ${tier}.`, 'success');
+    const UPI_ID = 'adityakumarsharma@slc';
+    const UPI_NAME = 'Aditya Kumar Sharma';
+    let currentTierName = 'Chai Supporter';
+
+    function copyUpiId() {
+      navigator.clipboard.writeText(UPI_ID).then(() => {
+        FTechApp.showToast(`UPI ID "${UPI_ID}" copied to clipboard!`, 'success');
+      }).catch(() => {
+        FTechApp.showToast(`UPI ID: ${UPI_ID}`, 'info');
+      });
     }
+
+    function openSupportModal(amount, tierName, emoji = '✨') {
+      currentTierName = tierName;
+      const modal = document.getElementById('supportModal');
+      const titleEl = document.getElementById('modalTierTitle');
+      const badgeEl = document.getElementById('modalTierBadge');
+      const amountInput = document.getElementById('supportAmountInput');
+      const nameInput = document.getElementById('supporterName');
+
+      if (titleEl) titleEl.textContent = `${emoji} ${tierName}`;
+      if (badgeEl) badgeEl.textContent = tierName;
+      if (amountInput) amountInput.value = amount;
+
+      // Pre-fill name from current session if available
+      const currentUser = FTechApp.getCurrentUser();
+      if (currentUser && nameInput && !nameInput.value) {
+        nameInput.value = currentUser.fullName || currentUser.name || '';
+      }
+
+      updateModalQrCode();
+      modal.classList.add('active');
+    }
+
+    function closeSupportModal() {
+      const modal = document.getElementById('supportModal');
+      modal.classList.remove('active');
+    }
+
+    function updateModalQrCode() {
+      const amount = parseFloat(document.getElementById('supportAmountInput').value) || 49;
+      const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent('F-TECH ' + currentTierName)}`;
+      
+      const linkEl = document.getElementById('directUpiPayLink');
+      if (linkEl) {
+        linkEl.href = upiUrl;
+        linkEl.innerHTML = `
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          Pay ₹${amount} via Any UPI App
+        `;
+      }
+
+      const qrImg = document.getElementById('dynamicUpiQr');
+      if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;
+      }
+    }
+
+    async function loadSupportersList() {
+      const grid = document.getElementById('supportersGrid');
+      if (!grid) return;
+
+      const res = await FTechApp.apiCall('/api/donations');
+      if (res && res.success && res.data) {
+        const countEl = document.getElementById('totalSupportersCount');
+        if (countEl && res.stats) {
+          countEl.textContent = `${res.stats.totalSupporters} Proud Supporters`;
+        }
+
+        if (res.data.length === 0) {
+          grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🌟</div>
+              <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem;">Be Our First Hall of Fame Supporter</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.25rem;">
+                Contributions help us keep AKTU papers, topper notes, and lab manuals free for all engineering students.
+              </p>
+              <button onclick="openSupportModal(49, 'Chai Supporter', '☕')" class="btn btn-primary btn-sm">
+                Support F-TECH
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = res.data.map(d => {
+          let badgeColor = 'var(--accent-amber)';
+          let badgeIcon = '☕';
+          if (d.badge_tier.includes('Patron')) {
+            badgeColor = 'var(--accent-emerald)';
+            badgeIcon = '👑';
+          } else if (d.badge_tier.includes('Academic') || d.badge_tier.includes('Hero')) {
+            badgeColor = '#818cf8';
+            badgeIcon = '⭐';
+          }
+
+          return `
+            <div class="card-item" style="padding:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span class="badge-tag" style="background:rgba(255,255,255,0.05); color:${badgeColor}; font-weight:700; border:1px solid var(--border-glass);">
+                  ${badgeIcon} ${escapeHtml(d.badge_tier)}
+                </span>
+                <span style="font-weight:800; font-size:1.05rem; color:${badgeColor};">₹${d.amount}</span>
+              </div>
+              <h4 style="font-size:1.05rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+                ${escapeHtml(d.donor_name)}
+              </h4>
+              <p style="font-size:0.85rem; color:var(--text-muted); font-style:italic; line-height:1.4;">
+                "${escapeHtml(d.message || 'Proud student contributor')}"
+              </p>
+              <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.75rem; text-align:right;">
+                ${d.created_at ? d.created_at.split(' ')[0] : 'Recent'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSupportersList();
+
+      const modal = document.getElementById('supportModal');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeSupportModal();
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeSupportModal();
+        }
+      });
+
+      const confirmForm = document.getElementById('confirmSupportForm');
+      if (confirmForm) {
+        confirmForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const donor_name = document.getElementById('supporterName').value.trim();
+          const amount = parseFloat(document.getElementById('supportAmountInput').value) || 49;
+          const message = document.getElementById('supporterMessage').value.trim();
+          const submitBtn = document.getElementById('confirmSupportBtn');
+
+          if (!donor_name) {
+            FTechApp.showToast('Please enter your name', 'error');
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Recording your contribution...';
+
+          const res = await FTechApp.apiCall('/api/donations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              donor_name,
+              amount,
+              message,
+              badge_tier: currentTierName,
+              payment_method: 'UPI'
+            })
+          });
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = '✨ Confirm Contribution & Claim Badge';
+
+          if (res && res.success) {
+            FTechApp.showToast(`Thank you ${donor_name}! You are recognized as an F-TECH ${currentTierName}!`, 'success');
+            confirmForm.reset();
+            closeSupportModal();
+            loadSupportersList();
+          } else {
+            FTechApp.showToast(res?.message || 'Could not record contribution', 'error');
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

@@ -23,4 +23,7 @@ router.post('/:id/upvote', communityController.upvotePost);
 // POST /api/community/:id/answers (reply to a discussion)
 router.post('/:id/answers', communityController.addAnswer);
 
+// POST /api/community/answers/:id/upvote (upvote an answer)
+router.post('/answers/:id/upvote', communityController.upvoteAnswer);
+
 module.exports = router;

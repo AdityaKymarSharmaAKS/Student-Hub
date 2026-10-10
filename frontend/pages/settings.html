@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System & User Settings | F-TECH-Student-Hub</title>
+  <meta name="description" content="Customize your student preferences, theme, academic branch, and system settings on F-TECH Student-Hub. Founded by Aditya Kumar Sharma.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/cards.css">
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: sticky;
+      top: 5rem;
+    }
+    .settings-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition-smooth);
+    }
+    .settings-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+    }
+    .settings-nav-btn.active {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.3);
+      color: #818cf8;
+    }
+    [data-theme="light"] .settings-nav-btn.active {
+      background: #eef2ff;
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #4338ca;
+    }
+    .settings-section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    [data-theme="light"] .settings-section-card {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .settings-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .settings-info h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+    .settings-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-glass);
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="brand-link">
+          <div class="brand-logo-glow">FT</div>
+          <div class="brand-info">
+            <span class="brand-title">F-TECH</span>
+            <span class="brand-subtitle">Student-Hub</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Academic Portal</div>
+        <nav class="sidebar-nav">
+          <a href="../index.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Overview</span>
+          </a>
+          <a href="aktu-papers.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>AKTU Papers</span>
+          </a>
+          <a href="notes.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Handwritten Notes</span>
+          </a>
+          <a href="lab.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <span>Lab Experiments</span>
+          </a>
+          <a href="tutorial.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Tutorials</span>
+          </a>
+          <a href="subject.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Syllabus & Subjects</span>
+          </a>
+          <a href="community.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span>Community Forum</span>
+          </a>
+          <a href="donate.html" class="nav-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span>Support & Donate</span>
+          </a>
+          <a href="settings.html" class="nav-item active">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-founder-card">
+        <div class="founder-header">
+          <div class="founder-avatar">AS</div>
+          <div class="founder-details">
+            <h6>Aditya Kumar Sharma</h6>
+            <p>Founder & Owner</p>
+          </div>
+        </div>
+        <div class="company-tag">
+          <span>Company: <strong>F-TECH</strong></span>
+          <span class="status-online"><span class="status-dot"></span> Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div class="nav-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <div style="font-weight: 700; color: var(--text-main);">Application Preferences & Profile</div>
+        </div>
+        <div class="nav-right">
+          <div class="founder-badge-pill">
+            <span>F-TECH</span> • Aditya Kumar Sharma
+          </div>
+          <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">
+              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--primary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Settings & Configurations
+            </h1>
+            <p class="section-subtitle">Manage appearance, academic default filters, student profile, and diagnostic health</p>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Quick Sub-Navigation -->
+          <div class="settings-nav">
+            <button class="settings-nav-btn active" onclick="scrollToSection('sec-appearance')">
+              🎨 Appearance & Theme
+            </button>
+            <button class="settings-nav-btn" onclick="scrollToSection('sec-profile')">
+              👤 Academic Profile
+            </button>
+            <button class="settings-nav-btn" onclick="scrollToSection('sec-preferences')">
+              📑 Study & PDF Options
+            </button>
+            <button class="settings-nav-btn" onclick="scrollToSection('sec-system')">
+              ⚡ Server & Diagnostics
+            </button>
+          </div>
+
+          <!-- Settings Sections -->
+          <div>
+            <!-- Section 1: Appearance & Theme -->
+            <div id="sec-appearance" class="settings-section-card">
+              <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>🎨</span> Appearance & Theme Mode
+              </h3>
+
+              <div class="settings-row">
+                <div class="settings-info">
+                  <h4>Theme Mode</h4>
+                  <p>Toggle between high-contrast Dark Mode and clean Academic Light Mode.</p>
+                </div>
+                <div>
+                  <button id="themeToggleBtnSettings" class="btn btn-secondary btn-sm" onclick="toggleSettingsTheme()">
+                    Switch to Light Mode
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-info">
+                  <h4>Accent Highlight Color</h4>
+                  <p>Select your favorite interface accent tint.</p>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                  <button onclick="setAccentColor('indigo')" class="btn btn-sm" style="background:#6366f1; color:#fff; border:none; width:36px; height:36px; border-radius:50%;" title="Indigo"></button>
+                  <button onclick="setAccentColor('cyan')" class="btn btn-sm" style="background:#06b6d4; color:#fff; border:none; width:36px; height:36px; border-radius:50%;" title="Cyan"></button>
+                  <button onclick="setAccentColor('emerald')" class="btn btn-sm" style="background:#10b981; color:#fff; border:none; width:36px; height:36px; border-radius:50%;" title="Emerald"></button>
+                  <button onclick="setAccentColor('purple')" class="btn btn-sm" style="background:#a855f7; color:#fff; border:none; width:36px; height:36px; border-radius:50%;" title="Purple"></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Student Academic Profile -->
+            <div id="sec-profile" class="settings-section-card">
+              <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>👤</span> Student Academic Profile
+              </h3>
+
+              <form id="profileForm">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                  <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="prefFullName" class="form-control" placeholder="e.g. Alok Sharma">
+                  </div>
+                  <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="prefEmail" class="form-control" placeholder="student@aktu.ac.in">
+                  </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                  <div class="form-group">
+                    <label>Engineering Branch</label>
+                    <select id="prefBranch" class="form-control">
+                      <option value="CSE">Computer Science & Engineering (CSE)</option>
+                      <option value="IT">Information Technology (IT)</option>
+                      <option value="ECE">Electronics & Communication (ECE)</option>
+                      <option value="ME">Mechanical Engineering (ME)</option>
+                      <option value="Civil">Civil Engineering</option>
+                      <option value="Common">1st Year Common</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Current Semester</label>
+                    <select id="prefSemester" class="form-control">
+                      <option value="1">Semester 1</option>
+                      <option value="2">Semester 2</option>
+                      <option value="3">Semester 3</option>
+                      <option value="4">Semester 4</option>
+                      <option value="5">Semester 5</option>
+                      <option value="6">Semester 6</option>
+                      <option value="7">Semester 7</option>
+                      <option value="8">Semester 8</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                  <label>College / Affiliated Institute</label>
+                  <input type="text" id="prefCollege" class="form-control" placeholder="e.g. Dr. A.P.J. Abdul Kalam Technical University College">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-sm">
+                  Save Profile Changes
+                </button>
+              </form>
+            </div>
+
+            <!-- Section 3: Study & Document Preferences -->
+            <div id="sec-preferences" class="settings-section-card">
+              <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>📑</span> Study & Document Preferences
+              </h3>
+
+              <div class="settings-row">
+                <div class="settings-info">
+                  <h4>Default Document Viewer</h4>
+                  <p>Open notes & papers in full interactive in-browser previewer instead of raw download.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="prefUseViewer" checked onchange="saveDocPref()">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-info">
+                  <h4>Auto-Filter By My Semester</h4>
+                  <p>Automatically pre-filter Notes and AKTU Papers to match your profile semester on page visit.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="prefAutoFilter" checked onchange="saveDocPref()">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-info">
+                  <h4>Clear Saved Browser Cache</h4>
+                  <p>Reset locally stored filter states and recent search queries.</p>
+                </div>
+                <button onclick="clearUserCache()" class="btn btn-secondary btn-sm" style="color:var(--accent-rose); border-color:var(--accent-rose);">
+                  Clear Local Cache
+                </button>
+              </div>
+            </div>
+
+            <!-- Section 4: System & Diagnostics -->
+            <div id="sec-system" class="settings-section-card">
+              <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>⚡</span> Server Health & Platform Diagnostics
+              </h3>
+
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:1rem;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Server Status</div>
+                  <div id="diagServerStatus" style="font-size:1.15rem; font-weight:800; color:var(--accent-emerald); display:flex; align-items:center; gap:0.4rem; margin-top:0.25rem;">
+                    <span style="width:8px; height:8px; border-radius:50%; background:var(--accent-emerald); display:inline-block;"></span> ONLINE
+                  </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:1rem;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">API Latency</div>
+                  <div id="diagLatency" style="font-size:1.15rem; font-weight:800; color:#38bdf8; margin-top:0.25rem;">
+                    -- ms
+                  </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:1rem;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Database</div>
+                  <div style="font-size:1.15rem; font-weight:800; color:#a855f7; margin-top:0.25rem;">
+                    SQLite Synced
+                  </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:1rem;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Platform Version</div>
+                  <div style="font-size:1.15rem; font-weight:800; color:var(--accent-amber); margin-top:0.25rem;">
+                    v2.4.0 F-TECH
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.2); border-radius:var(--radius-md); padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                <div>
+                  <div style="font-weight:700; color:var(--text-main);">🏢 Company: F-TECH</div>
+                  <div style="font-size:0.85rem; color:var(--text-muted);">Founder & Owner: <strong>Aditya Kumar Sharma</strong></div>
+                </div>
+                <button onclick="pingDiagnostics()" class="btn btn-secondary btn-sm">
+                  🔄 Re-Check Server Ping
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div class="footer-bottom">
+          <div class="founder-credit">
+            © 2026 <strong>F-TECH</strong> • Developed by <strong>Aditya Kumar Sharma</strong>. High-performance platform for AKTU engineering scholars.
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script>
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.settings-nav-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+      }
+    }
+
+    function toggleSettingsTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('ftech_theme', next);
+      updateThemeBtnText(next);
+      FTechApp.showToast(`Switched to ${next} mode`, 'info');
+    }
+
+    function updateThemeBtnText(theme) {
+      const btn = document.getElementById('themeToggleBtnSettings');
+      if (btn) {
+        btn.textContent = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+      }
+    }
+
+    function setAccentColor(color) {
+      let hex = '#6366f1';
+      if (color === 'cyan') hex = '#06b6d4';
+      if (color === 'emerald') hex = '#10b981';
+      if (color === 'purple') hex = '#a855f7';
+      document.documentElement.style.setProperty('--primary', hex);
+      localStorage.setItem('ftech_accent', hex);
+      FTechApp.showToast(`Accent color updated to ${color}`, 'success');
+    }
+
+    function loadSavedProfile() {
+      const user = FTechApp.getCurrentUser() || JSON.parse(localStorage.getItem('ftech_student_profile') || '{}');
+      if (user.fullName || user.name) document.getElementById('prefFullName').value = user.fullName || user.name;
+      if (user.email) document.getElementById('prefEmail').value = user.email;
+      if (user.branch) document.getElementById('prefBranch').value = user.branch;
+      if (user.semester) document.getElementById('prefSemester').value = user.semester;
+      if (user.college) document.getElementById('prefCollege').value = user.college;
+
+      const savedViewer = localStorage.getItem('ftech_pref_viewer');
+      if (savedViewer !== null) {
+        document.getElementById('prefUseViewer').checked = savedViewer === 'true';
+      }
+
+      const savedAutoFilter = localStorage.getItem('ftech_pref_autofilter');
+      if (savedAutoFilter !== null) {
+        document.getElementById('prefAutoFilter').checked = savedAutoFilter === 'true';
+      }
+
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      updateThemeBtnText(currentTheme);
+
+      const savedAccent = localStorage.getItem('ftech_accent');
+      if (savedAccent) {
+        document.documentElement.style.setProperty('--primary', savedAccent);
+      }
+    }
+
+    function saveDocPref() {
+      const useViewer = document.getElementById('prefUseViewer').checked;
+      const autoFilter = document.getElementById('prefAutoFilter').checked;
+      localStorage.setItem('ftech_pref_viewer', useViewer);
+      localStorage.setItem('ftech_pref_autofilter', autoFilter);
+      FTechApp.showToast('Preferences updated', 'info');
+    }
+
+    function clearUserCache() {
+      if (confirm('Clear local preferences and search filters? Your login session will be preserved.')) {
+        localStorage.removeItem('ftech_pref_viewer');
+        localStorage.removeItem('ftech_pref_autofilter');
+        localStorage.removeItem('ftech_accent');
+        FTechApp.showToast('Local cache cleared successfully', 'success');
+        setTimeout(() => location.reload(), 400);
+      }
+    }
+
+    async function pingDiagnostics() {
+      const start = performance.now();
+      const statusEl = document.getElementById('diagServerStatus');
+      const latencyEl = document.getElementById('diagLatency');
+
+      try {
+        const res = await FTechApp.apiCall('/api/health');
+        const end = performance.now();
+        const latency = Math.round(end - start);
+
+        if (res && res.status === 'ONLINE') {
+          if (statusEl) statusEl.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:var(--accent-emerald); display:inline-block;"></span> ONLINE`;
+          if (latencyEl) latencyEl.textContent = `${latency} ms`;
+          FTechApp.showToast(`Server responsive (${latency}ms)`, 'success');
+        } else {
+          if (statusEl) statusEl.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:var(--accent-rose); display:inline-block;"></span> OFFLINE`;
+          if (latencyEl) latencyEl.textContent = 'Err';
+        }
+      } catch (e) {
+        if (statusEl) statusEl.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:var(--accent-rose); display:inline-block;"></span> ERROR`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSavedProfile();
+      pingDiagnostics();
+
+      const profileForm = document.getElementById('profileForm');
+      if (profileForm) {
+        profileForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const profile = {
+            fullName: document.getElementById('prefFullName').value.trim(),
+            email: document.getElementById('prefEmail').value.trim(),
+            branch: document.getElementById('prefBranch').value,
+            semester: document.getElementById('prefSemester').value,
+            college: document.getElementById('prefCollege').value.trim()
+          };
+
+          localStorage.setItem('ftech_student_profile', JSON.stringify(profile));
+
+          const user = FTechApp.getCurrentUser();
+          if (user) {
+            const updated = { ...user, ...profile };
+            localStorage.setItem('ftech_user', JSON.stringify(updated));
+          }
+
+          FTechApp.showToast('Academic profile saved successfully!', 'success');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

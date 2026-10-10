@@ -124,3 +124,14 @@ exports.addAnswer = (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.upvoteAnswer = (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare('UPDATE community_answers SET upvotes = upvotes + 1 WHERE id = ?').run(id);
+    const updated = db.prepare('SELECT upvotes FROM community_answers WHERE id = ?').get(id);
+    res.json({ success: true, upvotes: updated ? updated.upvotes : 0 });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
