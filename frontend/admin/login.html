@@ -44,5 +44,31 @@
 
   <script src="../js/app.js"></script>
   <script src="../js/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Clean up stale or expired tokens on visiting the login page
+      const adminToken = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
+      if (adminToken) {
+        if (isTokenExpired(adminToken)) {
+          clearAdminSession();
+        } else {
+          // If valid admin token exists, skip login and enter dashboard directly
+          const user = JSON.parse(localStorage.getItem('ftech_admin_user') || localStorage.getItem('ftech_user') || '{}');
+          if (user && (user.isAdmin || (user.role && user.role.toLowerCase().includes('admin')))) {
+            window.location.replace('dashboard.html');
+            return;
+          }
+        }
+      }
+
+      // Check URL query parameters for notifications
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('expired') === '1') {
+        FTechApp.showToast('Your administrative session has expired. Please sign in with your credentials.', 'error');
+      } else if (urlParams.get('logout') === '1') {
+        FTechApp.showToast('You have signed out successfully.', 'info');
+      }
+    });
+  </script>
 </body>
 </html>

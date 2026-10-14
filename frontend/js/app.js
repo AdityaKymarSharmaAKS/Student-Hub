@@ -79,6 +79,31 @@ const FTechApp = (() => {
 
       const response = await fetch(url, { ...options, headers });
       const data = await response.json();
+
+      // Automatic Session Expiry Interceptor:
+      // Catches 401 Unauthorized or 403 Invalid/Expired token responses
+      const isAuthAction = endpoint.includes('/login') || endpoint.includes('/register') || endpoint.includes('/send-otp');
+      if (!isAuthAction && (response.status === 401 || (response.status === 403 && data && data.message && data.message.toLowerCase().includes('token')))) {
+        const isAdminRoute = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/admin/');
+        console.warn('[F-TECH Session Expired Interceptor]:', data.message || 'Session expired');
+
+        // Clear invalid/expired credentials from localStorage
+        localStorage.removeItem('ftech_admin_token');
+        localStorage.removeItem('ftech_admin_user');
+        localStorage.removeItem('ftech_token');
+        localStorage.removeItem('ftech_user');
+
+        if (isAdminRoute && !window.location.pathname.toLowerCase().includes('login.html')) {
+          showToast('Administrator session has expired or is invalid. Redirecting to admin sign-in...', 'error');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 800);
+        } else if (!isAdminRoute) {
+          showToast('Your session has expired. Please sign in again.', 'info');
+          updateUserUI();
+        }
+      }
+
       return data;
     } catch (error) {
       console.error(`API Error on ${endpoint}:`, error);
@@ -153,7 +178,7 @@ const FTechApp = (() => {
     setTimeout(() => {
       const rawPath = window.location.pathname.replace(/\\/g, '/').toLowerCase();
       if (rawPath.includes('/admin/')) {
-        window.location.href = '../pages/login.html';
+        window.location.href = 'login.html';
       } else if (rawPath.includes('/pages/')) {
         window.location.href = 'login.html';
       } else {
@@ -614,7 +639,7 @@ const FTechApp = (() => {
       const isElevated = user && (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin);
       if (!isElevated || !adminToken) {
         showToast('Administrator privileges required. Please sign in as Admin.', 'error');
-        window.location.replace('../pages/login.html');
+        window.location.replace('login.html');
         return false;
       }
     }

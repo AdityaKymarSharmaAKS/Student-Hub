@@ -27,6 +27,14 @@ exports.login = (req, res) => {
   }
 };
 
+exports.verifyToken = (req, res) => {
+  res.json({
+    success: true,
+    valid: true,
+    admin: req.user
+  });
+};
+
 exports.getStats = (req, res) => {
   try {
     const subjectsCount = db.prepare('SELECT COUNT(*) as count FROM subjects').get().count;

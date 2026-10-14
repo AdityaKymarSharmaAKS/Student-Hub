@@ -63,8 +63,8 @@ const authLimiter = createRateLimiter({
 
 const adminAuthLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: 'Too many administrative sign-in attempts.'
+  max: 30,
+  message: 'Too many administrative sign-in attempts. Please wait a few moments before trying again.'
 });
 
 const otpLimiter = createRateLimiter({

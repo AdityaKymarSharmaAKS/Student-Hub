@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
-const { JWT_SECRET } = require('../middleware/authentication');
+const { JWT_SECRET, verifyTokenWithFallback } = require('../middleware/authentication');
 const { validateEmail, validatePassword, validateFullName } = require('../middleware/validator');
 const postgresService = require('../services/postgresService');
 
@@ -387,7 +387,7 @@ exports.getMe = (req, res) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyTokenWithFallback(token);
 
     // Fetch fresh details from DB if student user
     const userRow = db.prepare('SELECT id, full_name, email, branch, semester, role FROM users WHERE id = ?').get(decoded.id);

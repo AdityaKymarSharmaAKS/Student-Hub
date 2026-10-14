@@ -28,6 +28,44 @@ let cachedCommunity = [];
 let cachedUsers = [];
 let cachedDownloadLogs = [];
 
+// Safely decode base64 JWT payload in browser
+function decodeJwtPayload(token) {
+  if (!token || typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  try {
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
+// Check if JWT token has expired or is invalid
+function isTokenExpired(token) {
+  if (!token || typeof token !== 'string') return true;
+  const payload = decodeJwtPayload(token);
+  if (!payload || !payload.exp) return true;
+  // exp timestamp is in seconds, Date.now() is in milliseconds.
+  // Add 10-second margin against network latency
+  return payload.exp * 1000 <= (Date.now() + 10000);
+}
+
+// Clear all administrator and user credentials from browser storage
+function clearAdminSession() {
+  localStorage.removeItem('ftech_admin_token');
+  localStorage.removeItem('ftech_admin_user');
+  localStorage.removeItem('ftech_token');
+  localStorage.removeItem('ftech_user');
+}
+
 // Admin Login
 async function handleAdminLogin(event) {
   event.preventDefault();
@@ -39,6 +77,9 @@ async function handleAdminLogin(event) {
     FTechApp.showToast('Please enter both username and password', 'error');
     return;
   }
+
+  // Purge any stale tokens before signing in
+  clearAdminSession();
 
   loginBtn.disabled = true;
   loginBtn.textContent = 'Verifying credentials...';
@@ -57,7 +98,7 @@ async function handleAdminLogin(event) {
     FTechApp.showToast(`Welcome Administrator, ${res.admin.fullName}!`, 'success');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 600);
+    }, 500);
   } else {
     loginBtn.disabled = false;
     loginBtn.textContent = 'Sign In to F-TECH Admin';
@@ -65,7 +106,7 @@ async function handleAdminLogin(event) {
   }
 }
 
-// Check admin auth state
+// Check admin auth state and validate token freshness
 function checkAdminAuth() {
   const adminToken = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
   const user = JSON.parse(localStorage.getItem('ftech_user') || '{}');
@@ -74,25 +115,36 @@ function checkAdminAuth() {
   const role = ((user.role || '') + ' ' + (adminUser.role || '')).toLowerCase();
   const isAdmin = role.includes('admin') || user.isAdmin === true || adminUser.isAdmin === true;
 
+  // 1. Missing credentials or not admin role
   if (!adminToken || !isAdmin) {
+    clearAdminSession();
     FTechApp.showToast('Administrator privileges required. Please sign in with your Admin ID.', 'error');
     setTimeout(() => {
-      window.location.href = '../pages/login.html';
+      window.location.href = 'login.html';
     }, 400);
     return false;
   }
+
+  // 2. Client-side JWT expiration check
+  if (isTokenExpired(adminToken)) {
+    console.warn('[F-TECH Admin Auth] Token expired or invalid signature detected. Clearing session.');
+    clearAdminSession();
+    FTechApp.showToast('Administrator session has expired. Please sign in again.', 'error');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 400);
+    return false;
+  }
+
   return true;
 }
 
 // Logout
 function adminLogout() {
-  localStorage.removeItem('ftech_admin_token');
-  localStorage.removeItem('ftech_admin_user');
-  localStorage.removeItem('ftech_token');
-  localStorage.removeItem('ftech_user');
-  FTechApp.showToast('Logged out from F-TECH Admin', 'info');
+  clearAdminSession();
+  FTechApp.showToast('Logged out from F-TECH Admin Command', 'info');
   setTimeout(() => {
-    window.location.href = '../pages/login.html';
+    window.location.href = 'login.html';
   }, 400);
 }
 

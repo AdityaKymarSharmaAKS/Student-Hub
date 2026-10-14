@@ -13,6 +13,7 @@ const { adminAuthLimiter } = require('../middleware/rateLimiter');
 
 // Authentication (Rate-limited against brute-force attacks)
 router.post('/login', adminAuthLimiter, adminController.login);
+router.get('/verify-token', authenticateAdmin, adminController.verifyToken);
 
 // Dashboard Statistics & Analytics
 router.get('/stats', authenticateAdmin, adminController.getStats);
