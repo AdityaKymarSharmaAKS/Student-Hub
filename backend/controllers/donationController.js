@@ -37,30 +37,43 @@ exports.getDonations = (req, res) => {
 // POST /api/donations (record a new contribution/supporter)
 exports.createDonation = (req, res) => {
   try {
-    const { donor_name, amount, payment_method, message, badge_tier } = req.body;
+    const { donor_name, amount, payment_method, message } = req.body;
 
-    if (!donor_name || !amount) {
+    if (!donor_name || amount === undefined || amount === null) {
       return res.status(400).json({
         success: false,
-        message: 'Donor name and amount are required.'
+        message: 'Donor name and donation amount are required.'
       });
     }
 
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    const cleanName = String(donor_name).trim().slice(0, 60);
+    if (cleanName.length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Valid donation amount is required.'
+        message: 'Donor name must be at least 2 characters long.'
       });
     }
 
-    // Determine badge tier if not provided
-    let tier = badge_tier;
-    if (!tier) {
-      if (numAmount >= 499) tier = 'Patron of Education';
-      else if (numAmount >= 199) tier = 'Academic Hero';
-      else if (numAmount >= 49) tier = 'Chai Supporter';
-      else tier = 'Supporter';
+    const numAmount = Math.round(parseFloat(amount) * 100) / 100;
+    if (isNaN(numAmount) || numAmount < 1 || numAmount > 50000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Donation amount must be between ₹1 and ₹50,000.'
+      });
+    }
+
+    const cleanMessage = message ? String(message).trim().slice(0, 180) : 'Proud supporter of F-TECH Student-Hub';
+    const validMethods = ['UPI', 'Card', 'NetBanking', 'QR', 'Cash'];
+    const cleanMethod = validMethods.includes(payment_method) ? payment_method : 'UPI';
+
+    // Calculate badge tier deterministically from verified amount
+    let tier = 'Supporter';
+    if (numAmount >= 499) {
+      tier = 'Patron of Education';
+    } else if (numAmount >= 199) {
+      tier = 'Academic Hero';
+    } else if (numAmount >= 49) {
+      tier = 'Chai Supporter';
     }
 
     const insert = db.prepare(`
@@ -69,16 +82,16 @@ exports.createDonation = (req, res) => {
     `);
 
     const result = insert.run(
-      donor_name.trim(),
+      cleanName,
       numAmount,
-      payment_method || 'UPI',
-      message ? message.trim() : 'Proud supporter of F-TECH Student-Hub',
+      cleanMethod,
+      cleanMessage,
       tier
     );
 
     res.status(201).json({
       success: true,
-      message: `Thank you ${donor_name.trim()}! Your support as a ${tier} has been recorded.`,
+      message: `Thank you ${cleanName}! Your contribution as a ${tier} has been recorded.`,
       donationId: Number(result.lastInsertRowid),
       tier
     });

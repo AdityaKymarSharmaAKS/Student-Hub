@@ -55,12 +55,18 @@ const FTechApp = (() => {
       .replace(/'/g, '&#39;');
   }
 
-  // Generic API caller with token header injection
+  // Security Gateway API Key (Connects frontend with backend gateway)
+  const API_KEY = 'ftech_studenthub_api_sec_9941a87c5b632049e31d87f7';
+
+  // Generic API caller with token and API key injection
   async function apiCall(endpoint, options = {}) {
     try {
       const url = `${API_BASE}${endpoint}`;
       const headers = options.headers || {};
       
+      // Inject API Key Gateway Header
+      headers['X-API-Key'] = API_KEY;
+
       const adminToken = localStorage.getItem('ftech_admin_token');
       const userToken = localStorage.getItem('ftech_token');
       const token = (endpoint.includes('/admin') || window.location.pathname.includes('/admin'))
@@ -78,6 +84,23 @@ const FTechApp = (() => {
       console.error(`API Error on ${endpoint}:`, error);
       return { success: false, message: error.message };
     }
+  }
+
+  // Universal Download Trigger with Guest Protection
+  function triggerDownload(docId, docTitle = '') {
+    const user = getCurrentUser();
+    const token = localStorage.getItem('ftech_token') || localStorage.getItem('ftech_admin_token');
+
+    if (!user || !token) {
+      showToast('Authentication Required: Non-logged-in users cannot download study materials. Please sign in to continue.', 'error');
+      openAuthModal('login');
+      return;
+    }
+
+    const emailParam = encodeURIComponent(user.email || '');
+    const nameParam = encodeURIComponent(user.fullName || user.name || '');
+    showToast(`Downloading "${docTitle || 'Study Material'}"...`, 'info');
+    window.location.href = `${API_BASE}/api/documents/${docId}/download?user_email=${emailParam}&user_name=${nameParam}&token=${encodeURIComponent(token)}&apiKey=${encodeURIComponent(API_KEY)}`;
   }
 
   // Theme management (Dark / Light)
@@ -504,7 +527,7 @@ const FTechApp = (() => {
       showToast(res.message, 'success');
       const otpInput = document.getElementById('regOtp');
       if (otpInput) {
-        if (res.otp && !otpInput.value) otpInput.value = res.otp;
+        otpInput.value = ''; // Never auto-fill OTP: User must manually enter 6-digit code
         otpInput.focus();
       }
     } else {
@@ -577,40 +600,33 @@ const FTechApp = (() => {
     }
   }
 
-  // Enforce authentication on all app pages
+  // Open Guest Browsing Guard: The entire website is freely accessible from the home page!
+  // Only the restricted Admin Command Center requires administrator privileges.
   function enforceAuthGuard() {
     const rawPath = window.location.pathname.replace(/\\/g, '/').toLowerCase();
-    const isLoginOrReg = rawPath.endsWith('/login.html') || rawPath.endsWith('login.html') ||
-                         rawPath.endsWith('/register.html') || rawPath.endsWith('register.html');
     const isAdminDashboard = rawPath.includes('/admin/dashboard.html');
 
     const user = getCurrentUser();
-    const token = localStorage.getItem('ftech_token');
+    const adminToken = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
 
-    // 1. If NOT logged in, redirect to login page
-    if (!user || !token) {
-      if (!isLoginOrReg && !isAdminDashboard) {
-        const targetLogin = rawPath.includes('/pages/') 
-          ? 'login.html' 
-          : (rawPath.includes('/admin/') ? '../pages/login.html' : 'pages/login.html');
-        window.location.replace(targetLogin);
+    // Restrict only the Admin Dashboard
+    if (isAdminDashboard) {
+      const isElevated = user && (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin);
+      if (!isElevated || !adminToken) {
+        showToast('Administrator privileges required. Please sign in as Admin.', 'error');
+        window.location.replace('../pages/login.html');
         return false;
       }
-    } else {
-      // 2. If logged in and on login/register page, only auto-redirect if already SuperAdmin
-      if (isLoginOrReg) {
-        if (user.role === 'SuperAdmin' || user.role === 'Admin' || user.isAdmin) {
-          window.location.replace('../admin/dashboard.html');
-          return false;
-        }
-        // If logged in as student, allow them to view login page so they can sign in as Admin
-      }
     }
+
+    // All public pages (Home, Subjects, Syllabus, Notes, Community, Tutorials, Labs) are completely open for browsing!
     return true;
   }
 
   return {
     API_BASE,
+    API_KEY,
+    triggerDownload,
     showToast,
     apiCall,
     escapeHtml,

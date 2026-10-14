@@ -15,9 +15,19 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
+function getClientIp(req) {
+  if (req.ip) return req.ip;
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const list = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0];
+    return list.trim();
+  }
+  return req.socket?.remoteAddress || 'unknown';
+}
+
 function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 20, message = 'Too many requests. Please try again later.' }) {
   return function rateLimiter(req, res, next) {
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const ip = getClientIp(req);
     const routePath = req.originalUrl ? req.originalUrl.split('?')[0] : (req.baseUrl || '') + (req.path || '');
     const key = `${routePath}:${ip}`;
     const now = Date.now();
@@ -51,13 +61,27 @@ const authLimiter = createRateLimiter({
   message: 'Too many authentication attempts from your device.'
 });
 
+const adminAuthLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many administrative sign-in attempts.'
+});
+
 const otpLimiter = createRateLimiter({
   windowMs: 10 * 60 * 1000,
   max: 15,
   message: 'Too many verification code requests.'
 });
 
+const uploadLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 15,
+  message: 'Upload frequency exceeded. Please wait before submitting more academic materials.'
+});
+
 module.exports = {
   authLimiter,
-  otpLimiter
+  adminAuthLimiter,
+  otpLimiter,
+  uploadLimiter
 };

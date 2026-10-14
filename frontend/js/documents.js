@@ -73,9 +73,9 @@ function renderDocumentCards(docs) {
           <span class="badge-tag ${badgeClass}">${badgeLabel}</span>
         </div>
 
-        <div class="card-code">${doc.subject_code} • Sem ${doc.semester}</div>
-        <h3 class="card-title">${doc.title}</h3>
-        <p class="card-desc">Author/Verified by: ${doc.author_name || 'Aditya Kumar Sharma (F-TECH)'}</p>
+        <div class="card-code">${FTechApp.escapeHtml(doc.subject_code)} • Sem ${FTechApp.escapeHtml(doc.semester)}</div>
+        <h3 class="card-title">${FTechApp.escapeHtml(doc.title)}</h3>
+        <p class="card-desc">Author/Verified by: ${FTechApp.escapeHtml(doc.author_name || 'Aditya Kumar Sharma (F-TECH)')}</p>
 
         <div class="card-meta">
           <div class="meta-item">
@@ -110,11 +110,7 @@ function renderDocumentCards(docs) {
 }
 
 function downloadDoc(id) {
-  const user = FTechApp.getCurrentUser();
-  const emailParam = user ? encodeURIComponent(user.email || '') : '';
-  const nameParam = user ? encodeURIComponent(user.fullName || user.name || '') : '';
-  FTechApp.showToast('Preparing download from F-TECH servers...', 'info');
-  window.location.href = `${FTechApp.API_BASE}/api/documents/${id}/download?user_email=${emailParam}&user_name=${nameParam}`;
+  FTechApp.triggerDownload(id);
 }
 
 async function voteDocumentCard(id, voteType, event) {

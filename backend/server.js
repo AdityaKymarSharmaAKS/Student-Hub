@@ -14,6 +14,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
 
@@ -21,10 +22,29 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS and Body Parsers
+// Trust first proxy hop if behind reverse proxy (e.g. Nginx, Cloudflare)
+app.set('trust proxy', 1);
+
+// Security Headers with Helmet
+app.use(helmet({
+  contentSecurityPolicy: false, // Supports external fonts (Google Fonts) and CDNs
+  frameguard: { action: 'deny' }, // Protect against Clickjacking
+  xContentTypeOptions: true,     // Protect against MIME sniffing
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
+
+// Fallback headers
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
+
+// Enable CORS and Body Parsers (with size limits against large payload DoS)
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // Ensure database and uploads directory exist
 require('./config/database');
@@ -32,6 +52,10 @@ require('./config/database');
 // Static assets & frontend serving
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use(express.static(frontendPath));
+
+// API Key Security Gateway (Separates Frontend and Backend)
+const { verifyApiKey } = require('./middleware/apiKeyAuth');
+app.use('/api', verifyApiKey);
 
 // API Routes
 app.use('/api/auth', require('./routes/auth'));

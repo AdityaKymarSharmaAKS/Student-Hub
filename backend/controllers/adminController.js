@@ -7,6 +7,7 @@
 const db = require('../config/database');
 const AuthService = require('../services/authService');
 const StorageService = require('../services/storageService');
+const postgresService = require('../services/postgresService');
 
 exports.login = (req, res) => {
   try {
@@ -133,18 +134,52 @@ exports.deleteDocument = (req, res) => {
   }
 };
 
+exports.updateDocument = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, type, subject_code, semester, unit, author_name, is_approved } = req.body;
+    const doc = db.prepare('SELECT * FROM documents WHERE id = ?').get(id);
+    if (!doc) {
+      return res.status(404).json({ success: false, message: 'Document not found' });
+    }
+
+    const cleanTitle = (title || doc.title).trim();
+    const cleanType = type || doc.type;
+    const cleanSubCode = subject_code ? subject_code.toUpperCase().trim() : doc.subject_code;
+    const cleanSem = parseInt(semester, 10) || doc.semester;
+    const cleanUnit = parseInt(unit, 10) || doc.unit;
+    const cleanAuthor = (author_name || doc.author_name).trim();
+    const approvedVal = is_approved !== undefined ? (is_approved ? 1 : 0) : doc.is_approved;
+
+    db.prepare(`
+      UPDATE documents
+      SET title = ?, type = ?, subject_code = ?, semester = ?, unit = ?, author_name = ?, is_approved = ?
+      WHERE id = ?
+    `).run(cleanTitle, cleanType, cleanSubCode, cleanSem, cleanUnit, cleanAuthor, approvedVal, id);
+
+    res.json({ success: true, message: `Document "${cleanTitle}" updated successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // -------------------------------------------------------------
 // 2. SUBJECTS & SYLLABUS MANAGEMENT
 // -------------------------------------------------------------
 exports.getAllSubjectsAdmin = (req, res) => {
   try {
+    const metaRow = db.prepare("SELECT value FROM system_metadata WHERE key = 'max_semesters'").get();
+    const configuredMax = metaRow ? parseInt(metaRow.value, 10) : 8;
+
     const subjects = db.prepare(`
       SELECT s.*, 
-        (SELECT COUNT(*) FROM documents WHERE subject_code = s.code) as doc_count
+        (SELECT COUNT(*) FROM documents WHERE subject_code = s.code) as doc_count,
+        (SELECT id FROM documents WHERE subject_code = s.code AND type = 'syllabus' AND is_approved = 1 ORDER BY id DESC LIMIT 1) as syllabus_id,
+        (SELECT file_name FROM documents WHERE subject_code = s.code AND type = 'syllabus' AND is_approved = 1 ORDER BY id DESC LIMIT 1) as syllabus_file_name
       FROM subjects s 
       ORDER BY s.semester ASC, s.code ASC
     `).all();
-    res.json({ success: true, count: subjects.length, data: subjects });
+    res.json({ success: true, count: subjects.length, max_semesters: configuredMax, data: subjects });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -203,6 +238,140 @@ exports.deleteSubject = (req, res) => {
   }
 };
 
+exports.updateSubject = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { code, title, branch, semester, credits, description } = req.body;
+    const sub = db.prepare('SELECT * FROM subjects WHERE id = ?').get(id);
+    if (!sub) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+
+    const cleanCode = (code || sub.code).toUpperCase().trim();
+    db.prepare(`
+      UPDATE subjects
+      SET code = ?, title = ?, branch = ?, semester = ?, credits = ?, description = ?
+      WHERE id = ?
+    `).run(
+      cleanCode,
+      (title || sub.title).trim(),
+      branch || sub.branch,
+      parseInt(semester, 10) || sub.semester,
+      parseInt(credits, 10) || sub.credits,
+      description !== undefined ? description : sub.description,
+      id
+    );
+
+    res.json({ success: true, message: `Subject ${cleanCode} updated successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// -------------------------------------------------------------
+// 2B. SUBSUBJECTS / UNITS MANAGEMENT
+// -------------------------------------------------------------
+exports.getAllSubsubjectsAdmin = (req, res) => {
+  try {
+    const { subject_code } = req.query;
+    let sql = 'SELECT * FROM subsubjects';
+    const params = [];
+    if (subject_code) {
+      sql += ' WHERE UPPER(subject_code) = ?';
+      params.push(subject_code.toUpperCase().trim());
+    }
+    sql += ' ORDER BY subject_code ASC, unit_number ASC';
+    const subsubjects = db.prepare(sql).all(...params);
+    res.json({ success: true, count: subsubjects.length, data: subsubjects });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.createSubsubject = async (req, res) => {
+  try {
+    const { subject_code, unit_number, title, description, topics } = req.body;
+    if (!subject_code || !title) {
+      return res.status(400).json({ success: false, message: 'Subject code and unit title are required.' });
+    }
+
+    const cleanSubCode = subject_code.toUpperCase().trim();
+    const unitNum = parseInt(unit_number, 10) || 1;
+
+    const result = db.prepare(`
+      INSERT INTO subsubjects (subject_code, unit_number, title, description, topics)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(
+      cleanSubCode,
+      unitNum,
+      title.trim(),
+      (description || '').trim(),
+      (topics || '').trim()
+    );
+
+    // Sync to PostgreSQL if available
+    if (postgresService.pool) {
+      try {
+        await postgresService.query(`
+          INSERT INTO subsubjects (subject_code, unit_number, title, description, topics)
+          VALUES ($1, $2, $3, $4, $5)
+        `, [cleanSubCode, unitNum, title.trim(), (description || '').trim(), (topics || '').trim()]);
+      } catch (e) {}
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Unit / Subsubject "${title}" added successfully for ${cleanSubCode}!`,
+      id: Number(result.lastInsertRowid)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateSubsubject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subject_code, unit_number, title, description, topics } = req.body;
+    const existing = db.prepare('SELECT * FROM subsubjects WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Subsubject not found' });
+    }
+
+    const cleanSubCode = (subject_code || existing.subject_code).toUpperCase().trim();
+    const unitNum = parseInt(unit_number, 10) || existing.unit_number;
+    const cleanTitle = (title || existing.title).trim();
+    const cleanDesc = description !== undefined ? description.trim() : existing.description;
+    const cleanTopics = topics !== undefined ? topics.trim() : existing.topics;
+
+    db.prepare(`
+      UPDATE subsubjects
+      SET subject_code = ?, unit_number = ?, title = ?, description = ?, topics = ?
+      WHERE id = ?
+    `).run(cleanSubCode, unitNum, cleanTitle, cleanDesc, cleanTopics, id);
+
+    res.json({ success: true, message: `Subsubject "${cleanTitle}" updated successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteSubsubject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = db.prepare('SELECT * FROM subsubjects WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Subsubject not found' });
+    }
+
+    db.prepare('DELETE FROM subsubjects WHERE id = ?').run(id);
+
+    res.json({ success: true, message: `Subsubject "${existing.title}" deleted.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // -------------------------------------------------------------
 // 3. LAB EXPERIMENTS MANAGEMENT
 // -------------------------------------------------------------
@@ -227,7 +396,7 @@ exports.createLab = (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    insert.run(
+    const result = insert.run(
       subject_code.toUpperCase().trim(),
       parseInt(exp_no, 10),
       title.trim(),
@@ -238,7 +407,11 @@ exports.createLab = (req, res) => {
       viva_questions || ''
     );
 
-    res.status(201).json({ success: true, message: 'Lab experiment added successfully!' });
+    res.status(201).json({
+      success: true,
+      message: 'Lab experiment added successfully!',
+      id: Number(result.lastInsertRowid)
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -254,6 +427,37 @@ exports.deleteLab = (req, res) => {
 
     db.prepare('DELETE FROM lab_experiments WHERE id = ?').run(id);
     res.json({ success: true, message: `Lab experiment "${lab.title}" deleted.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateLab = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subject_code, exp_no, title, objective, language, code, output_sample, viva_questions } = req.body;
+    const lab = db.prepare('SELECT * FROM lab_experiments WHERE id = ?').get(id);
+    if (!lab) {
+      return res.status(404).json({ success: false, message: 'Lab experiment not found' });
+    }
+
+    db.prepare(`
+      UPDATE lab_experiments
+      SET subject_code = ?, exp_no = ?, title = ?, objective = ?, language = ?, code = ?, output_sample = ?, viva_questions = ?
+      WHERE id = ?
+    `).run(
+      (subject_code || lab.subject_code).toUpperCase().trim(),
+      parseInt(exp_no, 10) || lab.exp_no,
+      (title || lab.title).trim(),
+      (objective || lab.objective).trim(),
+      language || lab.language,
+      code !== undefined ? code : lab.code,
+      output_sample !== undefined ? output_sample : lab.output_sample,
+      viva_questions !== undefined ? viva_questions : lab.viva_questions,
+      id
+    );
+
+    res.json({ success: true, message: `Lab experiment "${lab.title}" updated successfully.` });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -329,7 +533,7 @@ exports.getAllUsersAdmin = (req, res) => {
   }
 };
 
-exports.toggleUserBlock = (req, res) => {
+exports.toggleUserBlock = async (req, res) => {
   try {
     const { id } = req.params;
     const user = db.prepare('SELECT id, full_name, email, is_blocked FROM users WHERE id = ?').get(id);
@@ -339,6 +543,26 @@ exports.toggleUserBlock = (req, res) => {
 
     const nextState = user.is_blocked ? 0 : 1;
     db.prepare('UPDATE users SET is_blocked = ? WHERE id = ?').run(nextState, id);
+
+    // Sync to Cloud PostgreSQL (Neon / Supabase)
+    if (postgresService && postgresService.pool) {
+      try {
+        await postgresService.query('UPDATE users SET is_blocked = $1 WHERE LOWER(email) = LOWER($2)', [nextState, user.email]);
+      } catch (pgErr) {
+        console.warn('[F-TECH PG User Block Sync Notice]:', pgErr.message);
+      }
+    }
+
+    const actionText = nextState === 1 ? 'BLOCKED' : 'UNBLOCKED';
+    postgresService.logActivity({
+      userId: user.id,
+      email: user.email,
+      name: user.full_name,
+      action: actionText,
+      details: `Account access ${actionText.toLowerCase()} by Administrator`,
+      ip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').toString().split(',')[0].trim(),
+      userAgent: req.headers['user-agent'] || ''
+    }, db);
 
     res.json({
       success: true,
@@ -350,7 +574,7 @@ exports.toggleUserBlock = (req, res) => {
   }
 };
 
-exports.deleteUser = (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = db.prepare('SELECT id, full_name, email FROM users WHERE id = ?').get(id);
@@ -359,6 +583,16 @@ exports.deleteUser = (req, res) => {
     }
 
     db.prepare('DELETE FROM users WHERE id = ?').run(id);
+
+    // Remove from Cloud PostgreSQL
+    if (postgresService && postgresService.pool) {
+      try {
+        await postgresService.query('DELETE FROM users WHERE LOWER(email) = LOWER($1)', [user.email]);
+      } catch (pgErr) {
+        console.warn('[F-TECH PG User Delete Sync Notice]:', pgErr.message);
+      }
+    }
+
     res.json({ success: true, message: `User account ${user.email} permanently removed.` });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -471,6 +705,48 @@ exports.deleteTutorial = (req, res) => {
 
     db.prepare('DELETE FROM tutorials WHERE id = ?').run(id);
     res.json({ success: true, message: `Tutorial "${tut.title}" deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// -------------------------------------------------------------
+// 8. SEMESTER SYSTEM CONFIGURATION
+// -------------------------------------------------------------
+exports.updateMaxSemesters = (req, res) => {
+  try {
+    const { max_semesters } = req.body;
+    const num = parseInt(max_semesters, 10);
+    if (isNaN(num) || num < 1 || num > 20) {
+      return res.status(400).json({ success: false, message: 'Total academic semesters must be a valid number between 1 and 20.' });
+    }
+
+    db.prepare(`
+      INSERT INTO system_metadata (key, value)
+      VALUES ('max_semesters', ?)
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value
+    `).run(String(num));
+
+    res.json({
+      success: true,
+      message: `System semester range successfully updated to ${num} semesters.`,
+      max_semesters: num
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// -------------------------------------------------------------
+// 9. LIVE USER TRACKING & REAL-TIME AUDIT
+// -------------------------------------------------------------
+exports.getLiveTracking = async (req, res) => {
+  try {
+    const data = await postgresService.getLiveTrackingData(db);
+    res.json({
+      success: true,
+      data
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

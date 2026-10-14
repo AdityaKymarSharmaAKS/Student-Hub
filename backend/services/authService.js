@@ -25,7 +25,7 @@ class AuthService {
       throw new Error('Invalid username or credentials');
     }
 
-    const isValid = (password === envAdminPass) || bcrypt.compareSync(password, admin.password_hash);
+    const isValid = bcrypt.compareSync(password, admin.password_hash);
     if (!isValid) {
       throw new Error('Invalid credentials');
     }

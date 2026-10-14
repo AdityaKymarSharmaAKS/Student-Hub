@@ -160,6 +160,10 @@
 
           grid.innerHTML = res.data.map((tut, i) => {
             const c = colors[i % colors.length];
+            const rawUrl = (tut.video_url || '').trim();
+            const isSafeUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
+            const safeHref = isSafeUrl ? FTechApp.escapeHtml(rawUrl) : '#';
+
             return `
               <div class="card-item">
                 <div class="card-header">
@@ -173,7 +177,7 @@
                 <p class="card-desc">${FTechApp.escapeHtml(tut.description || '')}</p>
                 <div class="card-footer">
                   <span style="font-size:0.8rem; color:var(--text-dim);">${FTechApp.escapeHtml(tut.instructor || 'F-TECH')}</span>
-                  <a href="${FTechApp.escapeHtml(tut.video_url)}" target="_blank" class="btn btn-primary btn-sm">Watch Series</a>
+                  <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Watch Series</a>
                 </div>
               </div>
             `;

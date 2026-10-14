@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('../config/database');
 const StorageService = require('../services/storageService');
+const postgresService = require('../services/postgresService');
 
 function getVoterIdentifier(req) {
   if (req.user && (req.user.email || req.user.id)) {
@@ -142,16 +143,27 @@ exports.downloadDocument = (req, res) => {
     db.prepare('UPDATE documents SET downloads_count = downloads_count + 1 WHERE id = ?').run(id);
 
     // Record audit download log
-    const userEmail = req.query.user_email || (req.body && req.body.user_email) || req.headers['x-user-email'] || (req.user ? req.user.email : 'guest@student.hub');
-    const userName = req.query.user_name || (req.body && req.body.user_name) || req.headers['x-user-name'] || (req.user ? req.user.name : 'Engineering Student');
+    const userEmail = (req.user && req.user.email) ? req.user.email : (req.query.user_email || 'student@studenthub');
+    const userName = (req.user && (req.user.fullName || req.user.name)) ? (req.user.fullName || req.user.name) : (req.query.user_name || 'Student');
     const userId = req.user ? req.user.id : null;
-    const ipAddress = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').toString();
+    const ipAddress = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').toString().split(',')[0].trim();
+    const userAgent = req.headers['user-agent'] || '';
 
     try {
       db.prepare(`
         INSERT INTO document_downloads (document_id, user_id, user_email, user_name, ip_address)
         VALUES (?, ?, ?, ?, ?)
       `).run(id, userId, userEmail, userName, ipAddress);
+      
+      postgresService.logActivity({
+        userId,
+        email: userEmail,
+        name: userName,
+        action: 'DOWNLOAD',
+        details: `Downloaded: "${doc.title}" (${doc.subject_code || 'General'})`,
+        ip: ipAddress,
+        userAgent
+      }, db);
     } catch (e) {
       console.warn('[F-TECH Download Audit Log]', e.message);
     }
@@ -242,42 +254,112 @@ exports.uploadDocument = (req, res) => {
       return res.status(400).json({ success: false, message: 'Title, type, and semester are required.' });
     }
 
+    const validTypes = ['notes', 'aktu-paper', 'lab', 'tutorial', 'syllabus'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ success: false, message: `Invalid document type. Allowed types: ${validTypes.join(', ')}` });
+    }
+
+    const cleanTitle = title.trim();
+    if (cleanTitle.length < 3 || cleanTitle.length > 150) {
+      return res.status(400).json({ success: false, message: 'Title length must be between 3 and 150 characters.' });
+    }
+
     const file = req.file;
-    const fileName = file ? file.originalname : `${title.toLowerCase().replace(/\s+/g, '-')}.pdf`;
+    const isAdmin = req.user && (req.user.role === 'SuperAdmin' || req.user.role === 'Admin' || req.user.isAdmin);
+
+    // SECURITY ENFORCEMENT: Official syllabus is strictly uploaded by Admin in PDF or DOCX/DOC format
+    if (type === 'syllabus') {
+      if (!isAdmin) {
+        if (file && file.path && fs.existsSync(file.path)) {
+          try { fs.unlinkSync(file.path); } catch (e) {}
+        }
+        return res.status(403).json({
+          success: false,
+          message: 'Security Policy Violation: Only administrators are authorized to upload official syllabus documents.'
+        });
+      }
+
+      if (!file) {
+        return res.status(400).json({
+          success: false,
+          message: 'Official syllabus upload requires an attached file.'
+        });
+      }
+
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (!['.pdf', '.docx', '.doc'].includes(ext)) {
+        if (file.path && fs.existsSync(file.path)) {
+          try { fs.unlinkSync(file.path); } catch (e) {}
+        }
+        return res.status(400).json({
+          success: false,
+          message: 'Official syllabus must be uploaded in PDF (.pdf) or Word Document (.docx, .doc) format only.'
+        });
+      }
+    }
+
+    const metaRow = db.prepare("SELECT value FROM system_metadata WHERE key = 'max_semesters'").get();
+    const maxSemesters = metaRow ? parseInt(metaRow.value, 10) : 8;
+    const parsedSemester = parseInt(semester, 10) || 1;
+    if (parsedSemester < 1 || parsedSemester > maxSemesters) {
+      if (file && file.path && fs.existsSync(file.path)) {
+        try { fs.unlinkSync(file.path); } catch (e) {}
+      }
+      return res.status(400).json({
+        success: false,
+        message: `Semester must be between 1 and ${maxSemesters}.`
+      });
+    }
+
+    const rawFileName = file ? file.originalname : `${cleanTitle.toLowerCase().replace(/[^a-z0-9_-]/g, '-')}.pdf`;
+    const sanitizedFileName = rawFileName.replace(/[\r\n"']/g, '').replace(/[^a-zA-Z0-9._-]/g, '_');
     const filePath = file ? file.path : null;
     const fileSize = file ? file.size : 1024 * 1024;
     const mimeType = file ? file.mimetype : 'application/pdf';
 
+    const isApproved = isAdmin ? 1 : 0; // Require admin approval for student uploads
+
+    let subjectId = req.body.subject_id ? parseInt(req.body.subject_id, 10) : null;
+    const cleanSubCode = subject_code ? subject_code.toUpperCase().trim() : null;
+    if (cleanSubCode) {
+      const sub = db.prepare('SELECT id, branch, semester FROM subjects WHERE code = ?').get(cleanSubCode);
+      if (sub) {
+        subjectId = sub.id;
+      }
+    }
+
     const insert = db.prepare(`
       INSERT INTO documents (
-        title, type, subject_code, semester, branch, unit, year, 
+        title, type, subject_id, subject_code, semester, branch, unit, year, 
         file_path, file_name, file_size, mime_type, author_name, 
         uploader_role, is_approved, likes_count, dislikes_count
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
     `);
 
-    const isApproved = req.user ? 1 : 1; 
-
     const result = insert.run(
-      title,
+      cleanTitle,
       type,
-      subject_code ? subject_code.toUpperCase() : 'GENERAL',
-      parseInt(semester, 10) || 1,
+      subjectId,
+      cleanSubCode || 'GENERAL',
+      parsedSemester,
       branch || 'CSE',
       unit ? parseInt(unit, 10) : 1,
       year ? parseInt(year, 10) : new Date().getFullYear(),
       filePath,
-      fileName,
+      sanitizedFileName,
       fileSize,
       mimeType,
-      author_name || 'F-TECH Student Contributor',
-      req.user ? 'Admin' : 'Student',
+      (author_name || (isAdmin ? 'Aditya Kumar Sharma (Admin)' : (req.user ? req.user.name || req.user.fullName : 'F-TECH Student Contributor'))).trim(),
+      isAdmin ? 'Admin' : 'Student',
       isApproved
     );
 
     res.status(201).json({
       success: true,
-      message: 'Document uploaded successfully to F-TECH Student-Hub!',
+      message: isAdmin 
+        ? 'Document uploaded and published successfully!' 
+        : 'Document submitted successfully! It will appear publicly upon moderator approval.',
+      isApproved,
       documentId: Number(result.lastInsertRowid)
     });
   } catch (error) {

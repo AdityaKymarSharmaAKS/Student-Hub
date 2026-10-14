@@ -8,20 +8,22 @@ const express = require('express');
 const router = express.Router();
 const documentController = require('../controllers/documentController');
 const { upload, handleUploadErrors } = require('../middleware/upload-validation');
+const { optionalUser, authenticateUser } = require('../middleware/authentication');
+const { uploadLimiter } = require('../middleware/rateLimiter');
 
 // GET /api/documents (filter by type, subject, semester, branch, year, unit)
-router.get('/', documentController.getDocuments);
+router.get('/', optionalUser, documentController.getDocuments);
 
 // GET /api/documents/:id (single document details)
-router.get('/:id', documentController.getDocumentById);
+router.get('/:id', optionalUser, documentController.getDocumentById);
 
-// GET /api/documents/:id/download (download document file)
-router.get('/:id/download', documentController.downloadDocument);
+// GET /api/documents/:id/download (download document file - authentication required)
+router.get('/:id/download', authenticateUser, documentController.downloadDocument);
 
 // POST /api/documents/:id/vote (like or dislike document)
-router.post('/:id/vote', documentController.voteDocument);
+router.post('/:id/vote', optionalUser, documentController.voteDocument);
 
-// POST /api/documents/upload (upload notes/papers with file)
-router.post('/upload', upload.single('file'), handleUploadErrors, documentController.uploadDocument);
+// POST /api/documents/upload (upload notes/papers with file, rate-limited - authentication required)
+router.post('/upload', uploadLimiter, authenticateUser, upload.single('file'), handleUploadErrors, documentController.uploadDocument);
 
 module.exports = router;

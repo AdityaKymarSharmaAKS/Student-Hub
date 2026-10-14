@@ -277,11 +277,10 @@
           otpHint.innerHTML = `<span style="color:var(--accent-emerald); font-weight:700;">✅ Code sent! Check your notification or enter code above.</span>`;
         }
         const otpInput = document.getElementById('regOtp');
-        if (res.otp && !otpInput.value) {
-          // Pre-populate or prompt for quick completion
-          otpInput.value = res.otp;
+        if (otpInput) {
+          otpInput.value = ''; // Never auto-fill OTP: User must manually enter 6-digit code
+          otpInput.focus();
         }
-        otpInput.focus();
       } else {
         FTechApp.showToast(res.message || 'Failed to send verification code', 'error');
       }

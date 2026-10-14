@@ -105,6 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('file', fileInput.files[0]);
       }
 
+      const user = FTechApp.getCurrentUser();
+      if (!user) {
+        FTechApp.showToast('Authentication required: Non-logged-in visitors cannot upload materials. Please sign in to continue.', 'error');
+        FTechApp.openAuthModal('login');
+        return;
+      }
+
       const submitBtn = uploadForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.disabled = true;
@@ -112,7 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const token = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
-        const headers = {};
+        const headers = {
+          'X-API-Key': FTechApp.API_KEY
+        };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const response = await fetch(`${FTechApp.API_BASE}/api/documents/upload`, {

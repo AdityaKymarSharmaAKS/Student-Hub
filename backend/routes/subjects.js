@@ -14,6 +14,9 @@ router.get('/', subjectController.getAllSubjects);
 // GET /api/subjects/labs (list all or filtered labs)
 router.get('/labs/all', subjectController.getSubjectLabs);
 
+// GET /api/subjects/meta/semesters (dynamic semester list)
+router.get('/meta/semesters', subjectController.getSemesters);
+
 // GET /api/subjects/:code (subject details, syllabus, notes, labs)
 router.get('/:code', subjectController.getSubjectByCode);
 

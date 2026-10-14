@@ -94,6 +94,12 @@
       <button class="admin-tab-btn" onclick="switchAdminTab('subjects')">
         📖 Subjects & Syllabus <span class="tab-badge" id="badgeSubsCount">0</span>
       </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('subsubjects')">
+        📑 Course Units & Modules <span class="tab-badge" id="badgeSubsubCount">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('live-tracking')" style="border: 1px solid rgba(239,68,68,0.5); color: #ef4444; font-weight: 700;">
+        🔴 Live User Tracking & Cloud Sync
+      </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('tutorials')">
         ▶ Video Tutorials <span class="tab-badge" id="badgeTutorialsCount">0</span>
       </button>
@@ -169,14 +175,33 @@
     <!-- TAB 2: Subjects Management -->
     <div id="tab-subjects" class="admin-tab-pane">
       <div class="data-table-container">
+        <!-- Semester Range Configuration Panel -->
+        <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 0.98rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>⚙️</span> Total Academic Semesters Configuration (Semesters 1 to 8+)
+            </h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
+              Standard degree has 8 semesters. Administrators can increase the maximum academic semesters for dual-degree, post-graduate, or diploma curriculum.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <label for="adminMaxSemInput" style="font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Total Semesters:</label>
+            <input type="number" id="adminMaxSemInput" class="form-control" style="width: 80px; text-align: center; font-weight: 700;" min="1" max="20" value="8">
+            <button onclick="saveAdminMaxSemesters()" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+              Save Semesters
+            </button>
+          </div>
+        </div>
+
         <div class="table-header-bar">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 700;">Academic Subjects & Syllabus Master List</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Add new subjects, examine curriculum, or permanently delete unwanted subjects.</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage subjects, upload official syllabus (DOCX/PDF), and control semester curriculum.</p>
           </div>
           <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <select id="subFilterSem" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;" onchange="filterAdminSubjects()">
-              <option value="">All Semesters (1-8)</option>
+              <option value="">All Semesters</option>
               <option value="1">Semester 1</option>
               <option value="2">Semester 2</option>
               <option value="3">Semester 3</option>
@@ -201,6 +226,7 @@
                 <th>Branch</th>
                 <th>Semester</th>
                 <th>Credits</th>
+                <th>Official Syllabus (DOCX/PDF)</th>
                 <th>Linked Materials</th>
                 <th>Actions</th>
               </tr>
@@ -209,6 +235,120 @@
               <!-- Rendered via js/admin.js -->
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2B: Course Units & Subsubjects Management -->
+    <div id="tab-subsubjects" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">📑 Course Units & Syllabus Modules</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage unit breakdowns, module descriptions, and curriculum topics per subject.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <select id="subsubFilterSubject" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;" onchange="loadAdminSubsubjectsTable()">
+              <option value="">All Subjects</option>
+            </select>
+            <button onclick="openCreateSubsubjectModal()" class="btn btn-primary btn-sm">+ Add Course Unit</button>
+            <button onclick="loadAdminSubsubjectsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Subject Code</th>
+                <th>Unit #</th>
+                <th>Unit Title</th>
+                <th>Description</th>
+                <th>Key Topics</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubsubjectTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2C: Live User Tracking & Cloud Sync -->
+    <div id="tab-live-tracking" class="admin-tab-pane">
+      <!-- Live Metrics Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="stat-widget" style="border-left: 4px solid #10b981;">
+          <div class="stat-icon green">👥</div>
+          <div>
+            <div class="stat-number" id="liveStatTotal">0</div>
+            <div class="stat-label">Total Registered Accounts</div>
+          </div>
+        </div>
+        <div class="stat-widget" style="border-left: 4px solid #3b82f6;">
+          <div class="stat-icon blue">⚡</div>
+          <div>
+            <div class="stat-number" id="liveStatActive">0</div>
+            <div class="stat-label">Active Users (Last 30m)</div>
+          </div>
+        </div>
+        <div class="stat-widget" style="border-left: 4px solid #ef4444;">
+          <div class="stat-icon red">🚫</div>
+          <div>
+            <div class="stat-number" id="liveStatBlocked">0</div>
+            <div class="stat-label">Blocked / Suspended</div>
+          </div>
+        </div>
+        <div class="stat-widget" style="border-left: 4px solid #a855f7;">
+          <div class="stat-icon purple">☁️</div>
+          <div>
+            <div class="stat-number" id="liveStatDb" style="font-size: 1.1rem; padding-top: 0.3rem;">PostgreSQL</div>
+            <div class="stat-label">Primary Cloud Sync</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; align-items: start;">
+        <!-- Online / Active Users Table -->
+        <div class="data-table-container">
+          <div class="table-header-bar">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700;">🔴 Live Active Users & Sessions</h3>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Real-time tracking of IP, device, and suspension controls.</p>
+            </div>
+            <button onclick="loadLiveTrackingData()" class="btn btn-secondary btn-sm">Refresh Stream</button>
+          </div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User & Email</th>
+                  <th>Branch / Sem</th>
+                  <th>IP Address</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="liveUsersTableBody">
+                <!-- Rendered via js/admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Real-Time User Activity Audit Stream -->
+        <div class="data-table-container">
+          <div class="table-header-bar">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700;">📜 Live Activity Audit Feed</h3>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Event logs (Registrations, Logins, Downloads).</p>
+            </div>
+          </div>
+          <div id="liveActivityStream" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
+            <!-- Rendered via js/admin.js -->
+          </div>
         </div>
       </div>
     </div>
@@ -377,6 +517,141 @@
               </tr>
             </thead>
             <tbody id="adminDownloadLogsTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 8: Subsubjects & Course Units Management -->
+    <div id="tab-subsubjects" class="admin-tab-pane">
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Course Units & Subsubjects (Modules) Governance</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage 5 syllabus units/modules per subject with complete create, edit, and delete permissions.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <select id="subsubFilterSubject" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem; width: 170px;" onchange="filterSubsubjects()">
+              <option value="">All Subjects</option>
+            </select>
+            <input type="text" id="subsubSearchInput" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.8rem; width: 180px;" placeholder="Search unit title..." oninput="filterSubsubjects()">
+            <button onclick="openCreateSubsubjectModal()" class="btn btn-primary btn-sm">+ Add Unit / Module</button>
+            <button onclick="loadAdminSubsubjectsTable()" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Subject Code</th>
+                <th>Unit #</th>
+                <th>Unit / Module Title</th>
+                <th>Curriculum Topics</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubsubjectsTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 9: Live User Tracking & Real-Time Audit -->
+    <div id="tab-live-tracking" class="admin-tab-pane">
+      <!-- Cloud Persistence Banner -->
+      <div style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(56,189,248,0.12)); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Cloud Database Sync Active: <span style="color:#10b981;" id="liveDbSource">PostgreSQL (Neon Lakebase / Supabase)</span></div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Users and activity logs are permanently preserved across server restarts and synchronized in real time.</div>
+          </div>
+        </div>
+        <button onclick="loadLiveTrackingData()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+          🔄 Live Sync Refresh
+        </button>
+      </div>
+
+      <!-- Live User Counts -->
+      <div class="stats-row" style="margin-bottom: 1.5rem;">
+        <div class="stat-widget">
+          <div class="stat-icon emerald">🟢</div>
+          <div>
+            <div class="stat-number" id="liveOnlineCount">0</div>
+            <div class="stat-label">Active / Online Users (Last 30 Min)</div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-icon indigo">👥</div>
+          <div>
+            <div class="stat-number" id="liveTotalUsersCount">0</div>
+            <div class="stat-label">Total Permanent Accounts</div>
+          </div>
+        </div>
+        <div class="stat-widget">
+          <div class="stat-icon rose">🚫</div>
+          <div>
+            <div class="stat-number" id="liveBlockedCount">0</div>
+            <div class="stat-label">Suspended / Blocked Accounts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Online Users Table -->
+      <div class="data-table-container" style="margin-bottom: 1.5rem;">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Live Registered Users Activity</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Live tracking of student sessions, IP addresses, client devices, and status.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Branch / Sem</th>
+                <th>IP Address</th>
+                <th>Client Device / User Agent</th>
+                <th>Last Active</th>
+                <th>Account Status</th>
+                <th>Governance</th>
+              </tr>
+            </thead>
+            <tbody id="liveUsersTableBody">
+              <!-- Rendered via js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live Audit Feed Stream -->
+      <div class="data-table-container">
+        <div class="table-header-bar">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Real-Time Action Audit Stream</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Instant feed of logins, downloads, registrations, and administrative updates.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User / Operator</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="liveAuditStreamTableBody">
               <!-- Rendered via js/admin.js -->
             </tbody>
           </table>
@@ -615,6 +890,240 @@
     </div>
   </div>
 
+  <!-- Upload Official Syllabus Modal (DOCX / PDF Only) -->
+  <div class="modal-overlay" id="adminSyllabusModal">
+    <div class="modal-card" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.15rem; font-weight:700;">Upload Official Subject Syllabus (DOCX / PDF)</h3>
+        <span class="modal-close" onclick="closeAdminSyllabusModal()">&times;</span>
+      </div>
+      <form id="adminSyllabusForm" class="modal-body" onsubmit="handleAdminSyllabusSubmit(event)">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="adminSylSubCode" class="form-control" readonly style="background:rgba(255,255,255,0.06); font-weight:700;">
+          </div>
+          <div class="form-group">
+            <label>Semester</label>
+            <input type="text" id="adminSylSemester" class="form-control" readonly style="background:rgba(255,255,255,0.06);">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Syllabus Title *</label>
+          <input type="text" id="adminSylTitle" class="form-control" placeholder="e.g. KCS-301 Official AKTU Course Curriculum" required>
+        </div>
+        <div class="form-group">
+          <label>Official File (.docx, .doc, .pdf only) *</label>
+          <div id="adminSylDropZone" style="border: 2px dashed var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; cursor: pointer; background:rgba(255,255,255,0.02);">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Click to browse or drop official syllabus file</p>
+            <span style="font-size:0.75rem; color:var(--text-dim);">Accepts Word Document (.docx, .doc) or PDF (.pdf) up to 25MB</span>
+            <input type="file" id="adminSylFileInput" style="display:none;" accept=".pdf,.doc,.docx" required>
+            <div id="adminSylFileName" style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #38bdf8;"></div>
+          </div>
+        </div>
+        <button type="submit" id="adminSylSubmitBtn" class="btn btn-primary" style="width: 100%;">Upload Official Syllabus</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Subject Modal -->
+  <div class="modal-overlay" id="editSubjectModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Edit Academic Subject</h3>
+        <span class="modal-close" onclick="document.getElementById('editSubjectModal').classList.remove('active')">&times;</span>
+      </div>
+      <form id="editSubjectForm" class="modal-body" onsubmit="handleUpdateSubject(event)">
+        <input type="hidden" id="editSubId">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="editSubCodeInput" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Credits</label>
+            <input type="number" id="editSubCreditsInput" class="form-control" value="4">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subject Title *</label>
+          <input type="text" id="editSubTitleInput" class="form-control" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Semester *</label>
+            <select id="editSubSemInput" class="form-control" required>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Branch</label>
+            <select id="editSubBranchInput" class="form-control">
+              <option value="CSE">CSE / IT</option>
+              <option value="ECE">ECE</option>
+              <option value="ME">Mechanical</option>
+              <option value="Civil">Civil</option>
+              <option value="Common">Common 1st Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Curriculum Summary / Description</label>
+          <textarea id="editSubDescInput" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Subject Updates</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create / Edit Subsubject / Unit Modal -->
+  <div class="modal-overlay" id="subsubjectModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="subsubModalTitle">Add Course Unit / Module</h3>
+        <span class="modal-close" onclick="closeSubsubjectModal()">&times;</span>
+      </div>
+      <form id="subsubjectForm" class="modal-body" onsubmit="handleSaveSubsubject(event)">
+        <input type="hidden" id="subsubEditId" value="">
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="subsubCodeInput" class="form-control" placeholder="e.g. KCS-301" required>
+          </div>
+          <div class="form-group">
+            <label>Unit Number (1-5) *</label>
+            <input type="number" id="subsubUnitNumInput" class="form-control" min="1" max="10" value="1" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Unit / Module Title *</label>
+          <input type="text" id="subsubTitleInput" class="form-control" placeholder="e.g. Unit 1: Introduction to Data Structures & Arrays" required>
+        </div>
+        <div class="form-group">
+          <label>Description / Learning Outcomes</label>
+          <textarea id="subsubDescInput" class="form-control" rows="2" placeholder="Syllabus overview for this module..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Key Topics Breakdown</label>
+          <textarea id="subsubTopicsInput" class="form-control" rows="3" placeholder="Time complexity, Arrays, Sparse matrices, derivations..."></textarea>
+        </div>
+        <button type="submit" id="subsubSaveBtn" class="btn btn-primary" style="width: 100%;">Save Course Unit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Document Modal -->
+  <div class="modal-overlay" id="editDocModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Edit Study Material Metadata</h3>
+        <span class="modal-close" onclick="document.getElementById('editDocModal').classList.remove('active')">&times;</span>
+      </div>
+      <form id="editDocForm" class="modal-body" onsubmit="handleUpdateDoc(event)">
+        <input type="hidden" id="editDocId">
+        <div class="form-group">
+          <label>Document Title *</label>
+          <input type="text" id="editDocTitle" class="form-control" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="editDocType" class="form-control">
+              <option value="notes">Handwritten Notes</option>
+              <option value="aktu-paper">AKTU Question Paper</option>
+              <option value="lab">Lab Manual</option>
+              <option value="tutorial">Tutorial</option>
+              <option value="syllabus">Syllabus</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Subject Code</label>
+            <input type="text" id="editDocSubjectCode" class="form-control">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Semester</label>
+            <input type="number" id="editDocSemester" class="form-control" min="1" max="20" value="1">
+          </div>
+          <div class="form-group">
+            <label>Unit (1-5)</label>
+            <input type="number" id="editDocUnit" class="form-control" min="1" max="10" value="1">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="editDocStatus" class="form-control">
+              <option value="1">Approved / Active</option>
+              <option value="0">Blocked</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Author / Faculty Name</label>
+          <input type="text" id="editDocAuthor" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Document Updates</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Lab Assignment Modal -->
+  <div class="modal-overlay" id="editLabModal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>Edit Lab Experiment</h3>
+        <span class="modal-close" onclick="document.getElementById('editLabModal').classList.remove('active')">&times;</span>
+      </div>
+      <form id="editLabForm" class="modal-body" onsubmit="handleUpdateLab(event)">
+        <input type="hidden" id="editLabId">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" id="editLabSubCode" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Exp Number *</label>
+            <input type="number" id="editLabExpNo" class="form-control" min="1" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Experiment Title *</label>
+            <input type="text" id="editLabTitle" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input type="text" id="editLabLang" class="form-control" value="C/C++">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Objective *</label>
+          <textarea id="editLabObjective" class="form-control" rows="2" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Source Code *</label>
+          <textarea id="editLabCode" class="form-control" rows="6" required style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Sample Output</label>
+          <textarea id="editLabOutput" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Viva Questions & Answers</label>
+          <textarea id="editLabViva" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Lab Experiment Updates</button>
+      </form>
+    </div>
+  </div>
+
   <script src="../js/app.js"></script>
   <script src="../js/admin.js"></script>
   <script>
@@ -633,7 +1142,7 @@
         document.getElementById('uploadModal')?.classList.add('active');
       });
 
-      // File chooser
+      // File chooser & Drag-and-Drop: Direct Material Upload Modal
       const dropZone = document.getElementById('fileDropZone');
       const fileInput = document.getElementById('uploadFileInput');
       const fileNameEl = document.getElementById('selectedFileName');
@@ -644,6 +1153,72 @@
           fileNameEl.textContent = `Selected: ${fileInput.files[0].name} (${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
         }
       });
+      if (dropZone && fileInput) {
+        dropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropZone.style.borderColor = '#6366f1';
+          dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
+        });
+        dropZone.addEventListener('dragleave', () => {
+          dropZone.style.borderColor = 'var(--border-glass)';
+          dropZone.style.background = 'transparent';
+        });
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropZone.style.borderColor = 'var(--border-glass)';
+          dropZone.style.background = 'transparent';
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            fileNameEl.textContent = `Selected: ${fileInput.files[0].name} (${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
+          }
+        });
+      }
+
+      // File chooser & Drag-and-Drop: Official Syllabus Modal
+      const sylDropZone = document.getElementById('adminSylDropZone');
+      const sylFileInput = document.getElementById('adminSylFileInput');
+      const sylFileNameEl = document.getElementById('adminSylFileName');
+
+      sylDropZone?.addEventListener('click', () => sylFileInput?.click());
+      sylFileInput?.addEventListener('change', () => {
+        if (sylFileInput && sylFileInput.files && sylFileInput.files.length > 0) {
+          const f = sylFileInput.files[0];
+          const ext = f.name.split('.').pop().toLowerCase();
+          if (!['pdf', 'docx', 'doc'].includes(ext)) {
+            FTechApp.showToast('Invalid file format. Only DOCX (.docx) and PDF (.pdf) files are allowed for syllabus.', 'error');
+            sylFileInput.value = '';
+            sylFileNameEl.textContent = '';
+            return;
+          }
+          sylFileNameEl.textContent = `Selected: ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`;
+        }
+      });
+      if (sylDropZone && sylFileInput) {
+        sylDropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          sylDropZone.style.borderColor = '#38bdf8';
+          sylDropZone.style.background = 'rgba(56, 189, 248, 0.1)';
+        });
+        sylDropZone.addEventListener('dragleave', () => {
+          sylDropZone.style.borderColor = 'var(--border-glass)';
+          sylDropZone.style.background = 'rgba(255, 255, 255, 0.02)';
+        });
+        sylDropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          sylDropZone.style.borderColor = 'var(--border-glass)';
+          sylDropZone.style.background = 'rgba(255, 255, 255, 0.02)';
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const f = e.dataTransfer.files[0];
+            const ext = f.name.split('.').pop().toLowerCase();
+            if (!['pdf', 'docx', 'doc'].includes(ext)) {
+              FTechApp.showToast('Invalid file format. Only DOCX (.docx) and PDF (.pdf) files are allowed for syllabus.', 'error');
+              return;
+            }
+            sylFileInput.files = e.dataTransfer.files;
+            sylFileNameEl.textContent = `Selected: ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`;
+          }
+        });
+      }
     });
   </script>
 </body>

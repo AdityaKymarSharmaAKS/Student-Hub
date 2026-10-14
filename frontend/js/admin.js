@@ -104,11 +104,13 @@ function switchAdminTab(tabKey) {
   const targetPane = document.getElementById(`tab-${tabKey}`);
   if (targetPane) targetPane.classList.add('active');
 
-  const activeBtn = Array.from(document.querySelectorAll('.admin-tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabKey));
+  const activeBtn = Array.from(document.querySelectorAll('.admin-tab-btn')).find(b => b.getAttribute('onclick')?.includes(`'${tabKey}'`));
   if (activeBtn) activeBtn.classList.add('active');
 
   if (tabKey === 'documents') loadAdminDocumentsTable();
   if (tabKey === 'subjects') loadAdminSubjectsTable();
+  if (tabKey === 'subsubjects') loadAdminSubsubjectsTable();
+  if (tabKey === 'live-tracking') loadLiveTrackingData();
   if (tabKey === 'tutorials') loadAdminTutorialsTable();
   if (tabKey === 'labs') loadAdminLabsTable();
   if (tabKey === 'community') loadAdminCommunityTable();
@@ -201,6 +203,9 @@ function renderAdminDocsTable(docs) {
         </td>
         <td>
           <div class="action-buttons">
+            <button onclick="openEditDocModal(${doc.id})" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.5rem;" title="Edit Material">
+              ✏️ Edit
+            </button>
             <button onclick="toggleDocBlock(${doc.id}, ${isApproved ? 1 : 0})" class="${isApproved ? 'btn-icon-warning' : 'btn-icon-success'}" title="${isApproved ? 'Block Document' : 'Unblock / Approve'}">
               ${isApproved ? '🔒 Block' : '🔓 Unblock'}
             </button>
@@ -269,21 +274,77 @@ async function deleteDocAdmin(id) {
 }
 
 // --------------------------------------------------------------------------
-// 2. SUBJECTS TABLE & DELETE SUBJECT
+// 2. SUBJECTS TABLE, SEMESTERS CONFIGURATION & OFFICIAL SYLLABUS
 // --------------------------------------------------------------------------
+let adminConfiguredMaxSemesters = 8;
+
 async function loadAdminSubjectsTable() {
   const tableBody = document.getElementById('adminSubjectTableBody');
   if (!tableBody) return;
 
-  tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem;">Loading subjects...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2rem;">Loading subjects...</td></tr>`;
 
   const res = await FTechApp.apiCall('/api/admin/subjects');
   if (res.success && res.data) {
     cachedSubjects = res.data;
+    if (res.max_semesters) {
+      adminConfiguredMaxSemesters = res.max_semesters;
+      const semInput = document.getElementById('adminMaxSemInput');
+      if (semInput) semInput.value = res.max_semesters;
+      populateAdminSemesterDropdowns(res.max_semesters);
+    }
     if (document.getElementById('badgeSubsCount')) document.getElementById('badgeSubsCount').textContent = cachedSubjects.length;
     renderAdminSubjectsTable(cachedSubjects);
   } else {
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color:var(--accent-rose);">${res.message || 'Failed to load subjects'}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2rem; color:var(--accent-rose);">${res.message || 'Failed to load subjects'}</td></tr>`;
+  }
+}
+
+function populateAdminSemesterDropdowns(maxSem) {
+  const filterSem = document.getElementById('subFilterSem');
+  if (filterSem) {
+    const cur = filterSem.value;
+    let html = '<option value="">All Semesters</option>';
+    for (let i = 1; i <= maxSem; i++) {
+      html += `<option value="${i}">Semester ${i}</option>`;
+    }
+    filterSem.innerHTML = html;
+    if (cur && parseInt(cur, 10) <= maxSem) filterSem.value = cur;
+  }
+
+  const uploadSem = document.getElementById('uploadSemester');
+  if (uploadSem) {
+    const cur = uploadSem.value;
+    let html = '';
+    for (let i = 1; i <= maxSem; i++) {
+      html += `<option value="${i}" ${i === 3 ? 'selected' : ''}>Semester ${i}</option>`;
+    }
+    uploadSem.innerHTML = html;
+    if (cur && parseInt(cur, 10) <= maxSem) uploadSem.value = cur;
+  }
+}
+
+async function saveAdminMaxSemesters() {
+  const input = document.getElementById('adminMaxSemInput');
+  if (!input) return;
+
+  const num = parseInt(input.value, 10);
+  if (isNaN(num) || num < 1 || num > 20) {
+    FTechApp.showToast('Please enter a valid semester number between 1 and 20.', 'error');
+    return;
+  }
+
+  const res = await FTechApp.apiCall('/api/admin/semesters', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ max_semesters: num })
+  });
+
+  if (res.success) {
+    FTechApp.showToast(`Total academic semesters updated to ${num} successfully!`, 'success');
+    loadAdminSubjectsTable();
+  } else {
+    FTechApp.showToast(res.message || 'Failed to update semesters', 'error');
   }
 }
 
@@ -292,30 +353,64 @@ function renderAdminSubjectsTable(subjects) {
   if (!tableBody) return;
 
   if (subjects.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color:var(--text-muted);">No subjects found.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2.5rem; color:var(--text-muted);">No subjects found.</td></tr>`;
     return;
   }
 
-  tableBody.innerHTML = subjects.map(s => `
-    <tr>
-      <td><span class="card-code">${FTechApp.escapeHtml(s.code)}</span></td>
-      <td>
-        <strong>${FTechApp.escapeHtml(s.title)}</strong>
-        ${s.description ? `<div style="font-size:0.75rem; color:var(--text-muted); max-width:350px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${FTechApp.escapeHtml(s.description)}</div>` : ''}
-      </td>
-      <td>${FTechApp.escapeHtml(s.branch)}</td>
-      <td>Semester ${s.semester}</td>
-      <td>${s.credits} Credits</td>
-      <td><span class="badge-tag badge-aktu">${s.doc_count || 0} Docs</span></td>
-      <td>
-        <button onclick="deleteSubjectAdmin(${s.id}, '${FTechApp.escapeHtml(s.code)}', '${FTechApp.escapeHtml(s.title)}')" class="btn-icon-danger" title="Delete Subject">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
+  tableBody.innerHTML = subjects.map(s => {
+    const hasSyllabus = s.syllabus_id;
+    const isDocx = (s.syllabus_file_name || '').toLowerCase().endsWith('.docx') || (s.syllabus_file_name || '').toLowerCase().endsWith('.doc');
+
+    let syllabusHtml = '';
+    if (hasSyllabus) {
+      syllabusHtml = `
+        <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+          <a href="/api/documents/${s.syllabus_id}/download" class="badge-tag" style="background:${isDocx ? 'rgba(56,189,248,0.15)' : 'rgba(248,113,113,0.15)'}; color:${isDocx ? '#38bdf8' : '#f87171'}; border:1px solid ${isDocx ? 'rgba(56,189,248,0.3)' : 'rgba(248,113,113,0.3)'}; font-weight:700; text-decoration:none;" title="Download Syllabus">
+            ${isDocx ? '📄 DOCX' : '📕 PDF'}
+          </a>
+          <button onclick="openAdminSyllabusModal('${FTechApp.escapeHtml(s.code)}', ${s.semester}, '${FTechApp.escapeHtml(s.title)}')" class="btn btn-secondary btn-sm" style="font-size:0.72rem; padding:0.2rem 0.45rem;" title="Replace Syllabus File">
+            Change
+          </button>
+        </div>
+      `;
+    } else {
+      syllabusHtml = `
+        <button onclick="openAdminSyllabusModal('${FTechApp.escapeHtml(s.code)}', ${s.semester}, '${FTechApp.escapeHtml(s.title)}')" class="btn btn-primary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.6rem;">
+          + Upload (DOCX/PDF)
         </button>
-      </td>
-    </tr>
-  `).join('');
+      `;
+    }
+
+    return `
+      <tr>
+        <td><span class="card-code">${FTechApp.escapeHtml(s.code)}</span></td>
+        <td>
+          <strong>${FTechApp.escapeHtml(s.title)}</strong>
+          ${s.description ? `<div style="font-size:0.75rem; color:var(--text-muted); max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${FTechApp.escapeHtml(s.description)}</div>` : ''}
+        </td>
+        <td>${FTechApp.escapeHtml(s.branch)}</td>
+        <td>Semester ${s.semester}</td>
+        <td>${s.credits} Credits</td>
+        <td>${syllabusHtml}</td>
+        <td><span class="badge-tag badge-aktu">${s.doc_count || 0} Docs</span></td>
+        <td>
+          <div style="display:flex; gap:0.35rem; align-items:center;">
+            <button onclick="openEditSubjectModal(${s.id})" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.5rem;" title="Edit Subject Details">
+              ✏️ Edit
+            </button>
+            <button onclick="filterSubsubjectsByCode('${FTechApp.escapeHtml(s.code)}')" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.5rem;" title="Manage 5 Modules / Units">
+              📑 Units
+            </button>
+            <button onclick="deleteSubjectAdmin(${s.id}, '${FTechApp.escapeHtml(s.code)}', '${FTechApp.escapeHtml(s.title)}')" class="btn-icon-danger" title="Delete Subject">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function filterAdminSubjects() {
@@ -559,11 +654,16 @@ async function loadAdminLabsTable() {
           </div>
         </td>
         <td>
-          <button onclick="deleteLabAdmin(${lab.id}, '${FTechApp.escapeHtml(lab.title)}')" class="btn-icon-danger" title="Delete Lab Experiment">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          <div style="display:flex; gap:0.35rem; align-items:center;">
+            <button onclick="openEditLabModal(${lab.id})" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.5rem;" title="Edit Lab Experiment">
+              ✏️ Edit
+            </button>
+            <button onclick="deleteLabAdmin(${lab.id}, '${FTechApp.escapeHtml(lab.title)}')" class="btn-icon-danger" title="Delete Lab Experiment">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
@@ -806,53 +906,629 @@ function filterDownloadLogs() {
   renderDownloadLogsTable(filtered);
 }
 
-// Direct Admin Material Upload
+// ==========================================================================
+// 7. DIRECT ADMIN MATERIAL UPLOAD
+// ==========================================================================
 async function handleAdminUpload(e) {
   e.preventDefault();
-  const title = document.getElementById('uploadTitle').value.trim();
-  const type = document.getElementById('uploadType').value;
-  const subject_code = document.getElementById('uploadSubjectCode').value.trim();
-  const semester = document.getElementById('uploadSemester').value;
-  const branch = document.getElementById('uploadBranch').value;
-  const unit = document.getElementById('uploadUnit').value;
-  const fileInput = document.getElementById('uploadFileInput');
-
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('type', type);
-  formData.append('subject_code', subject_code);
-  formData.append('semester', semester);
-  formData.append('branch', branch);
-  formData.append('unit', unit);
-  formData.append('author_name', 'Aditya Kumar Sharma (F-TECH)');
-
-  if (fileInput.files.length > 0) {
-    formData.append('file', fileInput.files[0]);
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Publishing Material...';
   }
 
-  const token = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
-
   try {
-    const res = await fetch('/api/documents/upload', {
+    const title = document.getElementById('uploadTitle').value.trim();
+    const type = document.getElementById('uploadType').value;
+    const subject_code = document.getElementById('uploadSubjectCode').value.trim().toUpperCase();
+    const semester = document.getElementById('uploadSemester').value;
+    const branch = document.getElementById('uploadBranch').value;
+    const unit = document.getElementById('uploadUnit').value;
+    const fileInput = document.getElementById('uploadFileInput');
+
+    if (!title) {
+      FTechApp.showToast('Please enter document title.', 'error');
+      return;
+    }
+    if (!subject_code) {
+      FTechApp.showToast('Please enter relevant Subject Code (e.g. KCS-301).', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('type', type);
+    formData.append('subject_code', subject_code);
+    formData.append('semester', semester);
+    formData.append('branch', branch);
+    formData.append('unit', unit);
+    formData.append('author_name', 'Aditya Kumar Sharma (F-TECH)');
+
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      formData.append('file', fileInput.files[0]);
+    } else if (type === 'syllabus') {
+      FTechApp.showToast('Official syllabus requires an attached file (.docx/.pdf).', 'error');
+      return;
+    }
+
+    const token = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
+    const uploadUrl = `${FTechApp.API_BASE}/api/documents/upload`;
+
+    const res = await fetch(uploadUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'X-API-Key': FTechApp.API_KEY
       },
       body: formData
     });
+
     const data = await res.json();
 
     if (data.success) {
-      FTechApp.showToast('Material published directly to F-TECH Hub!', 'success');
+      FTechApp.showToast('Material published successfully to F-TECH Student-Hub!', 'success');
       document.getElementById('adminUploadForm').reset();
-      document.getElementById('selectedFileName').textContent = '';
+      const fileNameEl = document.getElementById('selectedFileName');
+      if (fileNameEl) fileNameEl.textContent = '';
       document.getElementById('uploadModal')?.classList.remove('active');
       loadAdminDashboard();
       loadAdminDocumentsTable();
     } else {
-      FTechApp.showToast(data.message || 'Upload failed', 'error');
+      FTechApp.showToast(data.message || data.error || 'Upload failed', 'error');
     }
   } catch (err) {
-    FTechApp.showToast('Upload failed: ' + err.message, 'error');
+    FTechApp.showToast('Upload error: ' + err.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publish to F-TECH Hub';
+    }
   }
 }
+
+// ==========================================================================
+// 8. ADMIN OFFICIAL SYLLABUS (DOCX / PDF) UPLOAD MODAL
+// ==========================================================================
+function openAdminSyllabusModal(code, semester, title) {
+  const modal = document.getElementById('adminSyllabusModal');
+  const codeInput = document.getElementById('adminSylSubCode');
+  const semInput = document.getElementById('adminSylSemester');
+  const titleInput = document.getElementById('adminSylTitle');
+
+  if (codeInput) codeInput.value = code;
+  if (semInput) semInput.value = `Semester ${semester}`;
+  if (titleInput) titleInput.value = `${code} Official AKTU Syllabus & Course Curriculum`;
+
+  const fileInput = document.getElementById('adminSylFileInput');
+  const fileNameEl = document.getElementById('adminSylFileName');
+  if (fileInput) fileInput.value = '';
+  if (fileNameEl) fileNameEl.textContent = '';
+
+  if (modal) modal.classList.add('active');
+}
+
+function closeAdminSyllabusModal() {
+  const modal = document.getElementById('adminSyllabusModal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleAdminSyllabusSubmit(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('adminSylFileInput');
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    FTechApp.showToast('Please select a valid DOCX or PDF syllabus file.', 'error');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf', 'docx', 'doc'].includes(ext)) {
+    FTechApp.showToast('Official syllabus must be in DOCX or PDF format only.', 'error');
+    return;
+  }
+
+  const submitBtn = document.getElementById('adminSylSubmitBtn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading Official Syllabus...';
+  }
+
+  const code = document.getElementById('adminSylSubCode').value.trim().toUpperCase();
+  const sub = (cachedSubjects || []).find(s => s.code.toUpperCase() === code);
+
+  const rawSem = document.getElementById('adminSylSemester')?.value || '';
+  const parsedSem = sub ? sub.semester : (parseInt(rawSem.replace(/[^0-9]/g, ''), 10) || 1);
+
+  const formData = new FormData();
+  formData.append('title', document.getElementById('adminSylTitle').value.trim());
+  formData.append('type', 'syllabus');
+  formData.append('subject_code', code);
+  formData.append('semester', parsedSem);
+  formData.append('branch', sub ? sub.branch : 'CSE');
+  formData.append('author_name', 'F-TECH Academic Administration');
+  formData.append('file', file);
+
+  const token = localStorage.getItem('ftech_admin_token') || localStorage.getItem('ftech_token');
+  const uploadUrl = `${FTechApp.API_BASE}/api/documents/upload`;
+
+  try {
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-API-Key': FTechApp.API_KEY
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      FTechApp.showToast('Official syllabus uploaded and linked successfully!', 'success');
+      closeAdminSyllabusModal();
+      document.getElementById('adminSyllabusForm').reset();
+      const fileNameEl = document.getElementById('adminSylFileName');
+      if (fileNameEl) fileNameEl.textContent = '';
+      loadAdminSubjectsTable();
+      loadAdminDashboard();
+    } else {
+      FTechApp.showToast(data.message || data.error || 'Upload failed', 'error');
+    }
+  } catch (err) {
+    FTechApp.showToast('Upload error: ' + err.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Upload Official Syllabus';
+    }
+  }
+}
+
+// ==========================================================================
+// 9. LIVE USER TRACKING & REAL-TIME AUDIT STREAM
+// ==========================================================================
+async function loadLiveTrackingData() {
+  const usersBody = document.getElementById('liveUsersTableBody');
+  const feedStream = document.getElementById('liveActivityStream');
+
+  if (usersBody) {
+    usersBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">Fetching live sessions...</td></tr>`;
+  }
+
+  const res = await FTechApp.apiCall('/api/admin/users/live-tracking');
+  if (res && res.success && res.data) {
+    const d = res.data;
+
+    // Metrics cards
+    if (document.getElementById('liveStatTotal')) document.getElementById('liveStatTotal').textContent = d.stats?.totalUsers || d.userCounts?.total || 0;
+    if (document.getElementById('liveStatActive')) document.getElementById('liveStatActive').textContent = d.stats?.activeToday || d.userCounts?.online || 0;
+    if (document.getElementById('liveStatBlocked')) document.getElementById('liveStatBlocked').textContent = d.stats?.blockedUsers || d.userCounts?.blocked || 0;
+    if (document.getElementById('liveStatDb')) document.getElementById('liveStatDb').textContent = d.database ? d.database.split(' ')[0] : 'PostgreSQL';
+
+    // Live Users Table
+    const users = d.liveUsers || d.onlineUsers || [];
+    if (usersBody) {
+      if (users.length === 0) {
+        usersBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem; color:var(--text-muted);">No tracked users recorded yet.</td></tr>`;
+      } else {
+        usersBody.innerHTML = users.map(u => {
+          const isSuspended = u.is_blocked === 1;
+          const statusBadge = isSuspended 
+            ? `<span class="badge-tag" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.4);">Suspended</span>`
+            : `<span class="badge-tag" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4);">● Active</span>`;
+
+          return `
+            <tr>
+              <td>
+                <strong>${FTechApp.escapeHtml(u.full_name)}</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${FTechApp.escapeHtml(u.email)}</div>
+              </td>
+              <td>${FTechApp.escapeHtml(u.branch || 'CSE')} / Sem ${u.semester || 1}</td>
+              <td><span style="font-family: var(--font-mono); font-size:0.75rem;">${FTechApp.escapeHtml(u.last_ip || '127.0.0.1')}</span></td>
+              <td>${statusBadge}</td>
+              <td>
+                <button onclick="toggleUserBlockInLive(${u.id}, ${isSuspended ? 1 : 0})" 
+                        class="${isSuspended ? 'btn-icon-success' : 'btn-icon-danger'}" 
+                        title="${isSuspended ? 'Unblock User' : 'Suspend Account'}">
+                  ${isSuspended ? '🔓 Unblock' : '🚫 Block'}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Live Activity Stream
+    const logs = d.activityLogs || d.recentLogs || [];
+    if (feedStream) {
+      if (logs.length === 0) {
+        feedStream.innerHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">No recent activity recorded.</div>`;
+      } else {
+        feedStream.innerHTML = logs.map(l => {
+          let actionColor = '#3b82f6';
+          let actionIcon = '⚡';
+          if (l.action === 'REGISTER') { actionColor = '#10b981'; actionIcon = '🎉'; }
+          if (l.action === 'DOWNLOAD') { actionColor = '#f59e0b'; actionIcon = '📥'; }
+          if (l.action === 'BLOCKED') { actionColor = '#ef4444'; actionIcon = '🚫'; }
+          if (l.action === 'UNBLOCKED') { actionColor = '#10b981'; actionIcon = '🔓'; }
+
+          const timeStr = l.created_at ? new Date(l.created_at).toLocaleTimeString() : 'Just now';
+
+          return `
+            <div style="padding: 0.65rem 0.85rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-glass); display: flex; gap: 0.75rem; align-items: center; font-size: 0.82rem;">
+              <span style="font-size: 1.1rem;">${actionIcon}</span>
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                  <strong style="color: ${actionColor}; font-size: 0.78rem;">${FTechApp.escapeHtml(l.action)}</strong>
+                  <span style="font-size: 0.7rem; color: var(--text-dim);">${timeStr}</span>
+                </div>
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.78rem; color: var(--text-main);">
+                  <strong>${FTechApp.escapeHtml(l.user_name || l.user_email || 'User')}:</strong> ${FTechApp.escapeHtml(l.details || '')}
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-dim);">IP: ${FTechApp.escapeHtml(l.ip_address || '127.0.0.1')}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  }
+}
+
+async function toggleUserBlockInLive(id, currentBlocked) {
+  const res = await FTechApp.apiCall(`/api/admin/users/${id}/block`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (res && res.success) {
+    FTechApp.showToast(res.message, 'success');
+    loadLiveTrackingData();
+    loadAdminUsersTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to update user status', 'error');
+  }
+}
+
+// ==========================================================================
+// 10. SUBSUBJECTS / COURSE UNITS GOVERNANCE
+// ==========================================================================
+let cachedSubsubjects = [];
+
+async function loadAdminSubsubjectsTable() {
+  const tableBody = document.getElementById('adminSubsubjectTableBody') || document.getElementById('adminSubsubjectsTableBody');
+  if (!tableBody) return;
+
+  const subjectCodeFilter = document.getElementById('subsubFilterSubject')?.value || '';
+  tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">Loading course units...</td></tr>`;
+
+  let url = '/api/admin/subsubjects';
+  if (subjectCodeFilter) url += `?subject_code=${encodeURIComponent(subjectCodeFilter)}`;
+
+  const res = await FTechApp.apiCall(url);
+  if (res && res.success && res.data) {
+    cachedSubsubjects = res.data;
+    const badge = document.getElementById('badgeSubsubCount');
+    if (badge) badge.textContent = cachedSubsubjects.length;
+
+    // Populate filter dropdown if empty
+    const filterSelect = document.getElementById('subsubFilterSubject');
+    if (filterSelect && filterSelect.options.length <= 1 && cachedSubjects.length > 0) {
+      cachedSubjects.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.code;
+        opt.textContent = `${s.code} - ${s.title.substring(0, 25)}...`;
+        filterSelect.appendChild(opt);
+      });
+      if (subjectCodeFilter) filterSelect.value = subjectCodeFilter;
+    }
+
+    renderAdminSubsubjectsTable(cachedSubsubjects);
+  } else {
+    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 2rem; color:var(--accent-rose);">Failed to load units.</td></tr>`;
+  }
+}
+
+function renderAdminSubsubjectsTable(units) {
+  const tableBody = document.getElementById('adminSubsubjectTableBody') || document.getElementById('adminSubsubjectsTableBody');
+  if (!tableBody) return;
+
+  if (units.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 2.5rem; color:var(--text-muted);">No course units found. Click "+ Add Course Unit" to create one.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = units.map(u => `
+    <tr>
+      <td><span class="card-code">${FTechApp.escapeHtml(u.subject_code)}</span></td>
+      <td><strong>Unit ${u.unit_number || u.unit_no || 1}</strong></td>
+      <td>
+        <strong>${FTechApp.escapeHtml(u.title)}</strong>
+        ${u.description ? `<div style="font-size:0.75rem; color:var(--text-muted); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${FTechApp.escapeHtml(u.description)}</div>` : ''}
+      </td>
+      <td>
+        <div style="font-size:0.78rem; color:var(--text-muted); max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${FTechApp.escapeHtml(u.topics || '')}">
+          ${FTechApp.escapeHtml(u.topics || 'Standard AKTU curriculum topics')}
+        </div>
+      </td>
+      <td><span style="font-size:0.78rem; color:var(--text-dim);">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'Active'}</span></td>
+      <td>
+        <div style="display:flex; gap:0.35rem; align-items:center;">
+          <button onclick="openEditSubsubjectModal(${u.id})" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:0.25rem 0.5rem;" title="Edit Unit">
+            ✏️ Edit
+          </button>
+          <button onclick="deleteSubsubjectAdmin(${u.id}, '${FTechApp.escapeHtml(u.title).replace(/'/g, "\\'")}')" class="btn-icon-danger" title="Delete Unit">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterSubsubjectsByCode(code) {
+  switchAdminTab('subsubjects');
+  const filterSelect = document.getElementById('subsubFilterSubject');
+  if (filterSelect) {
+    let exists = Array.from(filterSelect.options).some(o => o.value === code);
+    if (!exists) {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = `${code}`;
+      filterSelect.appendChild(opt);
+    }
+    filterSelect.value = code;
+  }
+  loadAdminSubsubjectsTable();
+}
+
+function openCreateSubsubjectModal(defaultCode = '') {
+  document.getElementById('subsubjectForm')?.reset();
+  const idEl = document.getElementById('subsubEditId');
+  if (idEl) idEl.value = '';
+  const titleEl = document.getElementById('subsubjectModalTitle');
+  if (titleEl) titleEl.textContent = 'Add Course Unit / Module';
+  const saveBtn = document.getElementById('subsubSaveBtn');
+  if (saveBtn) saveBtn.textContent = 'Save Course Unit';
+  if (defaultCode) {
+    const codeEl = document.getElementById('subsubCodeInput');
+    if (codeEl) codeEl.value = defaultCode;
+  }
+  document.getElementById('subsubjectModal')?.classList.add('active');
+}
+
+function openEditSubsubjectModal(id) {
+  const unit = cachedSubsubjects.find(u => u.id === id);
+  if (!unit) return;
+
+  const idEl = document.getElementById('subsubEditId');
+  if (idEl) idEl.value = unit.id;
+  document.getElementById('subsubCodeInput').value = unit.subject_code || '';
+  document.getElementById('subsubUnitNumInput').value = unit.unit_number || unit.unit_no || 1;
+  document.getElementById('subsubTitleInput').value = unit.title || '';
+  document.getElementById('subsubDescInput').value = unit.description || '';
+  document.getElementById('subsubTopicsInput').value = unit.topics || '';
+
+  const titleEl = document.getElementById('subsubjectModalTitle');
+  if (titleEl) titleEl.textContent = `Edit Unit ${unit.unit_number || 1} (${unit.subject_code})`;
+  const saveBtn = document.getElementById('subsubSaveBtn');
+  if (saveBtn) saveBtn.textContent = 'Update Course Unit';
+  document.getElementById('subsubjectModal')?.classList.add('active');
+}
+
+function closeSubsubjectModal() {
+  document.getElementById('subsubjectModal')?.classList.remove('active');
+}
+
+async function handleSaveSubsubject(e) {
+  e.preventDefault();
+  const id = document.getElementById('subsubEditId')?.value;
+  const subject_code = document.getElementById('subsubCodeInput').value.trim().toUpperCase();
+  const unit_number = parseInt(document.getElementById('subsubUnitNumInput').value, 10) || 1;
+  const title = document.getElementById('subsubTitleInput').value.trim();
+  const description = document.getElementById('subsubDescInput').value.trim();
+  const topics = document.getElementById('subsubTopicsInput').value.trim();
+
+  const payload = { subject_code, unit_number, title, description, topics };
+
+  let res;
+  if (id) {
+    res = await FTechApp.apiCall(`/api/admin/subsubjects/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } else {
+    res = await FTechApp.apiCall('/api/admin/subsubjects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  }
+
+  if (res && res.success) {
+    FTechApp.showToast(res.message || 'Course unit saved successfully!', 'success');
+    closeSubsubjectModal();
+    loadAdminSubsubjectsTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to save course unit', 'error');
+  }
+}
+
+async function deleteSubsubjectAdmin(id, title) {
+  if (!confirm(`Are you sure you want to delete unit "${title}"?`)) return;
+
+  const res = await FTechApp.apiCall(`/api/admin/subsubjects/${id}`, { method: 'DELETE' });
+  if (res && res.success) {
+    FTechApp.showToast(res.message, 'success');
+    loadAdminSubsubjectsTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to delete subsubject', 'error');
+  }
+}
+
+// ==========================================================================
+// 11. EDIT SUBJECT MODAL LOGIC
+// ==========================================================================
+function openEditSubjectModal(id) {
+  const sub = cachedSubjects.find(s => s.id === id);
+  if (!sub) return;
+
+  const setVal = (id1, id2, val) => {
+    const el = document.getElementById(id1) || document.getElementById(id2);
+    if (el) el.value = val;
+  };
+
+  setVal('editSubId', 'editSubId', sub.id);
+  setVal('editSubCodeInput', 'editSubCode', sub.code);
+  setVal('editSubCreditsInput', 'editSubCredits', sub.credits || 4);
+  setVal('editSubTitleInput', 'editSubTitle', sub.title);
+  setVal('editSubSemInput', 'editSubSem', sub.semester);
+  setVal('editSubBranchInput', 'editSubBranch', sub.branch || 'CSE');
+  setVal('editSubDescInput', 'editSubDesc', sub.description || '');
+
+  document.getElementById('editSubjectModal')?.classList.add('active');
+}
+
+function closeEditSubjectModal() {
+  document.getElementById('editSubjectModal')?.classList.remove('active');
+}
+
+async function handleUpdateSubject(e) {
+  e.preventDefault();
+  const getVal = (id1, id2) => {
+    const el = document.getElementById(id1) || document.getElementById(id2);
+    return el ? el.value : '';
+  };
+
+  const id = getVal('editSubId', 'editSubId');
+  const code = getVal('editSubCodeInput', 'editSubCode').trim().toUpperCase();
+  const credits = getVal('editSubCreditsInput', 'editSubCredits');
+  const title = getVal('editSubTitleInput', 'editSubTitle').trim();
+  const semester = getVal('editSubSemInput', 'editSubSem');
+  const branch = getVal('editSubBranchInput', 'editSubBranch');
+  const description = getVal('editSubDescInput', 'editSubDesc').trim();
+
+  const res = await FTechApp.apiCall(`/api/admin/subjects/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, credits, title, semester, branch, description })
+  });
+
+  if (res && res.success) {
+    FTechApp.showToast(res.message, 'success');
+    closeEditSubjectModal();
+    loadAdminSubjectsTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to update subject', 'error');
+  }
+}
+
+// ==========================================================================
+// 12. EDIT DOCUMENT MODAL LOGIC
+// ==========================================================================
+function openEditDocModal(id) {
+  const doc = cachedDocs.find(d => d.id === id);
+  if (!doc) return;
+
+  document.getElementById('editDocId').value = doc.id;
+  document.getElementById('editDocTitle').value = doc.title;
+  document.getElementById('editDocType').value = doc.type;
+  document.getElementById('editDocSubjectCode').value = doc.subject_code || '';
+  document.getElementById('editDocSemester').value = doc.semester || 1;
+  document.getElementById('editDocUnit').value = doc.unit || 1;
+  document.getElementById('editDocStatus').value = doc.is_approved !== undefined ? String(doc.is_approved) : '1';
+  document.getElementById('editDocAuthor').value = doc.author_name || '';
+
+  document.getElementById('editDocModal')?.classList.add('active');
+}
+
+function closeEditDocModal() {
+  document.getElementById('editDocModal')?.classList.remove('active');
+}
+
+async function handleUpdateDoc(e) {
+  e.preventDefault();
+  const id = document.getElementById('editDocId').value;
+  const title = document.getElementById('editDocTitle').value.trim();
+  const type = document.getElementById('editDocType').value;
+  const subject_code = document.getElementById('editDocSubjectCode').value.trim().toUpperCase();
+  const semester = document.getElementById('editDocSemester').value;
+  const unit = document.getElementById('editDocUnit').value;
+  const is_approved = parseInt(document.getElementById('editDocStatus').value, 10);
+  const author_name = document.getElementById('editDocAuthor').value.trim();
+
+  const res = await FTechApp.apiCall(`/api/admin/documents/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, type, subject_code, semester, unit, is_approved, author_name })
+  });
+
+  if (res && res.success) {
+    FTechApp.showToast(res.message, 'success');
+    closeEditDocModal();
+    loadAdminDocumentsTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to update document', 'error');
+  }
+}
+
+// ==========================================================================
+// 13. EDIT LAB EXPERIMENT MODAL LOGIC
+// ==========================================================================
+function openEditLabModal(id) {
+  const lab = cachedLabs.find(l => l.id === id);
+  if (!lab) return;
+
+  document.getElementById('editLabId').value = lab.id;
+  document.getElementById('editLabSubCode').value = lab.subject_code;
+  document.getElementById('editLabExpNo').value = lab.exp_no;
+  document.getElementById('editLabTitle').value = lab.title;
+  document.getElementById('editLabLang').value = lab.language || 'C/C++';
+  document.getElementById('editLabObjective').value = lab.objective || '';
+  document.getElementById('editLabCode').value = lab.code || '';
+  document.getElementById('editLabOutput').value = lab.output_sample || '';
+  document.getElementById('editLabViva').value = lab.viva_questions || '';
+
+  document.getElementById('editLabModal')?.classList.add('active');
+}
+
+function closeEditLabModal() {
+  document.getElementById('editLabModal')?.classList.remove('active');
+}
+
+async function handleUpdateLab(e) {
+  e.preventDefault();
+  const id = document.getElementById('editLabId').value;
+  const subject_code = document.getElementById('editLabSubCode').value.trim().toUpperCase();
+  const exp_no = document.getElementById('editLabExpNo').value;
+  const title = document.getElementById('editLabTitle').value.trim();
+  const language = document.getElementById('editLabLang').value.trim();
+  const objective = document.getElementById('editLabObjective').value.trim();
+  const code = document.getElementById('editLabCode').value;
+  const output_sample = document.getElementById('editLabOutput').value.trim();
+  const viva_questions = document.getElementById('editLabViva').value.trim();
+
+  const res = await FTechApp.apiCall(`/api/admin/labs/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subject_code, exp_no, title, language, objective, code, output_sample, viva_questions })
+  });
+
+  if (res && res.success) {
+    FTechApp.showToast(res.message, 'success');
+    closeEditLabModal();
+    loadAdminLabsTable();
+    loadAdminDashboard();
+  } else {
+    FTechApp.showToast(res?.message || 'Failed to update lab experiment', 'error');
+  }
+}
+

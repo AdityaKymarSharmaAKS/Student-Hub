@@ -246,8 +246,8 @@
 
             <div class="post-body">
               <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.25rem;">
-                Posted by <strong style="color:var(--text-main);">${p.author_name || 'Engineering Student'}</strong> 
-                <span class="badge-tag badge-sem" style="padding:0.15rem 0.4rem; font-size:0.68rem; margin-left:0.4rem;">${p.author_badge || 'Student'}</span>
+                Posted by <strong style="color:var(--text-main);">${escapeHtml(p.author_name || 'Engineering Student')}</strong> 
+                <span class="badge-tag badge-sem" style="padding:0.15rem 0.4rem; font-size:0.68rem; margin-left:0.4rem;">${escapeHtml(p.author_badge || 'Student')}</span>
                 <span style="margin-left:0.5rem; font-size:0.75rem;">• ${p.created_at ? p.created_at.split(' ')[0] : 'Recent'}</span>
               </div>
 
@@ -255,7 +255,10 @@
               <p class="post-preview">${escapeHtml(p.content)}</p>
 
               <div class="tag-list">
-                ${tags.map(t => `<span class="tag-pill" onclick="filterByTag('${t.trim()}')">#${t.trim()}</span>`).join('')}
+                ${tags.map(t => {
+                  const safeTag = escapeHtml(t.trim());
+                  return `<span class="tag-pill" onclick="filterByTag(this.getAttribute('data-tag'))" data-tag="${safeTag}">#${safeTag}</span>`;
+                }).join('')}
               </div>
 
               <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-dim); padding-top:0.6rem; border-top:1px solid var(--border-glass);">
